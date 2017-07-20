@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using Amazon.Lambda.SNSEvents;
 using Autofac;
+using Newtonsoft.Json;
+using PageUp.Events;
 using Serverless.Dotnet.Core;
 using Serverless.Dotnet.Core.Model;
 
@@ -19,10 +22,16 @@ namespace Serverless.Dotnet.Handlers
             Container = container;
         }
 
-        public Response Handle(Request request)
+        public Response Handle(SNSEvent snsEvent)
         {
             var serviceProcess = Container.Resolve<IServiceProcess>();
-            return serviceProcess.Process(request);
+
+            foreach (var record in snsEvent.Records)
+            {
+                var @event = JsonConvert.DeserializeObject<Event>(record.Sns.Message);
+                serviceProcess.Process(@event);
+            }
+            return default(Response);
         }
 
         public APIGatewayProxyResponse HealthCheck(APIGatewayProxyRequest request, ILambdaContext context)

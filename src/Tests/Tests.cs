@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using PageUp.Events;
 using Serverless.Dotnet.Core;
 using Serverless.Dotnet.Core.Model;
 using Xunit;
@@ -12,7 +13,7 @@ namespace Tests
         {
             IServiceProcess serviceProcess = Container.Resolve<IServiceProcess>();
 
-            var result = serviceProcess.Process(new Request("test1", "test2", "test3"));
+            var result = serviceProcess.Process(new Event());
 
             Assert.IsType<Response>(result);
         }
