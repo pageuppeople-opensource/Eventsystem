@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <DebugType>portable</DebugType>
-    <AssemblyName>Tests</AssemblyName>
+    <AssemblyName>BusinessEvents.SubscriptionEngine.Tests</AssemblyName>
     <PackageId>Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <PackageTargetFallback>$(PackageTargetFallback);dotnet5.4;portable-net451+win8</PackageTargetFallback>
@@ -14,8 +14,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Handlers\Handlers.csproj" />
+    <ProjectReference Include="..\Core\BusinessEvents.SubscriptionEngine.Core.csproj" />
+    <ProjectReference Include="..\Handlers\BusinessEvents.SubscriptionEngine.Handlers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

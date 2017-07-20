@@ -3,18 +3,15 @@
   <PropertyGroup>
     <AssemblyTitle>Serverless.Dotnet.Handlers</AssemblyTitle>
     <TargetFramework>netcoreapp1.0</TargetFramework>
-    <AssemblyName>Handlers</AssemblyName>
+    <AssemblyName>BusinessEvents.SubscriptionEngine.Handlers</AssemblyName>
     <PackageId>Handlers</PackageId>
     <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>BusinessEvents.SubscriptionEngine.Handlers</RootNamespace>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
@@ -29,6 +26,10 @@
 
   <ItemGroup>
     <DotNetCliToolReference Include="Amazon.Lambda.Tools" Version="0.9.0-preview1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\BusinessEvents.SubscriptionEngine.Core.csproj" />
   </ItemGroup>
 
 </Project>
