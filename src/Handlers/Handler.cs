@@ -19,7 +19,7 @@ namespace Serverless.Dotnet.Handlers
             Container = container;
         }
 
-        public Response Hello(Request request)
+        public Response Handle(Request request)
         {
             var serviceProcess = Container.Resolve<IServiceProcess>();
             return serviceProcess.Process(request);
