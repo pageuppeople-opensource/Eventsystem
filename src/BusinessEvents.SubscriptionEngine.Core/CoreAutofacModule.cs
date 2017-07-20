@@ -1,6 +1,6 @@
 ﻿using Autofac;
 
-namespace Serverless.Dotnet.Core
+namespace BusinessEvents.SubscriptionEngine.Core
 {
     public class CoreAutofacModule : Module
     {

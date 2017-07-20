@@ -1,4 +1,4 @@
-service: BusinessEvents.SubscriptionEngine 
+service: BusinessEvents-SubscriptionEngine 
 
 provider:
   name: aws
@@ -15,7 +15,7 @@ package:
   artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.0/publish/deploy-package.zip
 
 functions:
-  hello:
+  handle:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::Handle
     events:
       - sns: BusinessEvents

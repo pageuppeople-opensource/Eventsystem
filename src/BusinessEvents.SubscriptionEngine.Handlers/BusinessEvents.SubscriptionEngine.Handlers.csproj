@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\BusinessEvents.SubscriptionEngine.Core.csproj" />
+    <ProjectReference Include="..\BusinessEvents.SubscriptionEngine.Core\BusinessEvents.SubscriptionEngine.Core.csproj" />
   </ItemGroup>
 
 </Project>

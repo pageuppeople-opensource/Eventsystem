@@ -1,7 +1,7 @@
-﻿using PageUp.Events;
-using Serverless.Dotnet.Core.Model;
+﻿using BusinessEvents.SubscriptionEngine.Core.Model;
+using PageUp.Events;
 
-namespace Serverless.Dotnet.Core
+namespace BusinessEvents.SubscriptionEngine.Core
 {
     public interface IServiceProcess
     {

@@ -1,18 +1,13 @@
 ﻿using Autofac;
-using Serverless.Dotnet.Core;
+using BusinessEvents.SubscriptionEngine.Core;
 
-namespace Tests
+namespace BusinessEvents.SubscriptionEngine.Handlers
 {
-    public class TestBase
+    public class BaseHandler
     {
         protected IContainer Container;
 
-        public TestBase()
-        {
-            Container = BuildContainer();
-        }
-
-        protected IContainer BuildContainer()
+        protected virtual IContainer BuildContainer()
         {
             var builder = new ContainerBuilder();
             builder.RegisterModule(new CoreAutofacModule());

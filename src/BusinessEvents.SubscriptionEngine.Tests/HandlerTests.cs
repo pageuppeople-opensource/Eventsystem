@@ -1,9 +1,9 @@
 ﻿using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.TestUtilities;
-using Serverless.Dotnet.Handlers;
+using BusinessEvents.SubscriptionEngine.Handlers;
 using Xunit;
 
-namespace Tests
+namespace BusinessEvents.SubscriptionEngine.Tests
 {
     public class HandlerTests : TestBase
     {

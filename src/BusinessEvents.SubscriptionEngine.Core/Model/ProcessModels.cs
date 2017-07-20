@@ -1,6 +1,6 @@
 ﻿using PageUp.Events;
 
-namespace Serverless.Dotnet.Core.Model
+namespace BusinessEvents.SubscriptionEngine.Core.Model
 {
     public class Response
     {

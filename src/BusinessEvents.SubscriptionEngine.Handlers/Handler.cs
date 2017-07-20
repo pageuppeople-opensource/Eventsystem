@@ -3,12 +3,12 @@ using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SNSEvents;
 using Autofac;
+using BusinessEvents.SubscriptionEngine.Core;
+using BusinessEvents.SubscriptionEngine.Core.Model;
 using Newtonsoft.Json;
 using PageUp.Events;
-using Serverless.Dotnet.Core;
-using Serverless.Dotnet.Core.Model;
 
-namespace Serverless.Dotnet.Handlers
+namespace BusinessEvents.SubscriptionEngine.Handlers
 {
     public class Handler : BaseHandler
     {

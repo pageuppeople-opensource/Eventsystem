@@ -1,10 +1,10 @@
 ﻿using Autofac;
+using BusinessEvents.SubscriptionEngine.Core;
+using BusinessEvents.SubscriptionEngine.Core.Model;
 using PageUp.Events;
-using Serverless.Dotnet.Core;
-using Serverless.Dotnet.Core.Model;
 using Xunit;
 
-namespace Tests
+namespace BusinessEvents.SubscriptionEngine.Tests
 {
     public class Tests : TestBase
     {
