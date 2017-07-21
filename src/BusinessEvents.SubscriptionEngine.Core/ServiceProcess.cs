@@ -1,18 +1,19 @@
-﻿using BusinessEvents.SubscriptionEngine.Core.Model;
+﻿using System;
+using Newtonsoft.Json;
 using PageUp.Events;
 
 namespace BusinessEvents.SubscriptionEngine.Core
 {
     public interface IServiceProcess
     {
-        Response Process(Event request);
+        void Process(Event request);
     }
 
     public class ServiceProcess : IServiceProcess
     {
-        public Response Process(Event request)
+        public void Process(Event @event)
         {
-            return new Response("Go Serverless dotnetcore! Your C# function executed successfully!", request);
+            Console.WriteLine($"processed message - {JsonConvert.SerializeObject(@event)}");
         }
     }
 }

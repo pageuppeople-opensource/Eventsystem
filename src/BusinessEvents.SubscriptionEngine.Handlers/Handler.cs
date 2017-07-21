@@ -23,7 +23,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             Container = container;
         }
 
-        public Response Handle(SNSEvent snsEvent)
+        public void Handle(SNSEvent snsEvent)
         {
             var serviceProcess = Container.Resolve<IServiceProcess>();
 
@@ -33,7 +33,6 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                 var @event = JsonConvert.DeserializeObject<Event>(record.Sns.Message);
                 serviceProcess.Process(@event);
             }
-            return default(Response);
         }
 
         public APIGatewayProxyResponse HealthCheck(APIGatewayProxyRequest request, ILambdaContext context)

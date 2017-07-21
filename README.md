@@ -14,13 +14,6 @@ Install dotnetcore on your machine. If you encounter issues with VS2015, visit t
 https://github.com/aspnet/Tooling/blob/master/known-issues-vs2015.md
 
 
-## Setup
-
-Setup your AWS Credentials in your local environment
-```
-aws configure
-```
-
 ## Build
 
 Run the following command in powershell to build the project.
@@ -36,7 +29,7 @@ Use the following command for bash.
 ## Test
 To run unit tests
 ```
-dotnet test .\src\Tests
+dotnet test .\src\BusinessEvents.SubscriptionEngine.Tests\BusinessEvents.SubscriptionEngine.Tests.csproj
 ```
 
 ## Deploy
@@ -44,5 +37,8 @@ dotnet test .\src\Tests
 serverless deploy
 ```
 
+## Test data to pass to sns
 
-
+```
+{"Header":{"UserId":"userId","TransportTimeStamp":"2017-07-21T00:28:54.2282942Z","Metadata":{"metaheader1":"metaheadervalue1"},"Origin":"origin","InstanceId":"instanceId","CorrelationId":"d3e35fe4-ad84-46c0-b54f-3a6dc779630d"},"Messages":[{"Header":{"Metadata":null,"MessageType":"messagetype","MessageId":"a9757a12-a80e-4e32-9bab-e3d65a4b3a92"},"Body":{"contents":"bodycontents"}}]}
+```
