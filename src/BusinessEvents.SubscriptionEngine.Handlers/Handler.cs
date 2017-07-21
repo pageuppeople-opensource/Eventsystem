@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SNSEvents;
@@ -28,6 +29,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
             foreach (var record in snsEvent.Records)
             {
+                Console.WriteLine($"The sns message received was - {record.Sns.Message}");
                 var @event = JsonConvert.DeserializeObject<Event>(record.Sns.Message);
                 serviceProcess.Process(@event);
             }
