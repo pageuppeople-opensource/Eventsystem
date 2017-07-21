@@ -5,13 +5,12 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.SNSEvents;
 using Autofac;
 using BusinessEvents.SubscriptionEngine.Core;
-using BusinessEvents.SubscriptionEngine.Core.Model;
 using Newtonsoft.Json;
 using PageUp.Events;
 
 namespace BusinessEvents.SubscriptionEngine.Handlers
 {
-    public class Handler : BaseHandler
+    public sealed class Handler : BaseHandler
     {
         public Handler()
         {

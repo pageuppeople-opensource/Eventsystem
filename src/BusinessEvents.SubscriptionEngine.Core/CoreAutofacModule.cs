@@ -8,6 +8,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
         {
             base.Load(builder);
             builder.RegisterType<ServiceProcess>().As<IServiceProcess>().InstancePerDependency();
+            builder.RegisterType<SubscriptionsManager>().As<ISubscriptionsManager>().SingleInstance();
         }
     }
 }
