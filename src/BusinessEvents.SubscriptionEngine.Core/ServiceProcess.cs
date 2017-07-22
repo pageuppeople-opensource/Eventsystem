@@ -34,7 +34,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
                 using (var httpclient = new HttpClient())
                 {
                     await httpclient.PostAsync(subscription.Endpoint,
-                        new StringContent(JsonConvert.SerializeObject(eventMessage)));
+                        new StringContent($"payload={JsonConvert.SerializeObject(new { text = JsonConvert.SerializeObject(eventMessage) })}" ));
                 }
             }
         }

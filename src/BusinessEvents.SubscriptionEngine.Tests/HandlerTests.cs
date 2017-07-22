@@ -1,23 +1,59 @@
-﻿using Amazon.Lambda.APIGatewayEvents;
-using Amazon.Lambda.TestUtilities;
+﻿using System;
+using System.Collections.Generic;
+using Amazon.Lambda.SNSEvents;
+using Autofac;
+using BusinessEvents.SubscriptionEngine.Core;
 using BusinessEvents.SubscriptionEngine.Handlers;
+using NSubstitute;
+using PageUp.Events;
 using Xunit;
 
 namespace BusinessEvents.SubscriptionEngine.Tests
 {
     public class HandlerTests : TestBase
     {
-        [Fact]
-        public void TestHandler()
+
+        private IContainer CreateContainer(Action<ContainerBuilder> containerBuilderAction)
         {
-            var handler = new Handler(Container);
+            var containerBuilder = new ContainerBuilder();
+            
+            containerBuilderAction(containerBuilder);
+            
+            return containerBuilder.Build();
+        }
 
-            var request = new APIGatewayProxyRequest();
-            var context = new TestLambdaContext();
-            var response = handler.HealthCheck(request, context);
+        private Handler CreateHandler(IServiceProcess serviceProcess, ISubscriptionsManager subscriptionManager)
+        {
+            var container = CreateContainer(delegate (ContainerBuilder builder)
+            {
+                builder.RegisterInstance(serviceProcess);
+                builder.RegisterInstance(subscriptionManager);
+            });
 
-            Assert.Equal(200, response.StatusCode);
-            Assert.Equal("OK", response.Body);
+            var handler = new Handler(container);
+            return handler;
+        }
+
+        [Fact]
+        public void HandlePassesAllSnsRecordsToProcess()
+        {
+            // arrange
+            var testSnsEvent = new SNSEvent();
+            testSnsEvent.Records = new List<SNSEvent.SNSRecord>
+            {
+                new SNSEvent.SNSRecord { Sns = new SNSEvent.SNSMessage { Message = ""} },
+                new SNSEvent.SNSRecord { Sns = new SNSEvent.SNSMessage { Message = ""} }
+            };
+
+            var serviceProcess = Substitute.For<IServiceProcess>();
+            var subscriptionManager = Substitute.For<ISubscriptionsManager>();
+            Handler handler = CreateHandler(serviceProcess, subscriptionManager);
+
+            //act
+            handler.Handle(testSnsEvent);
+
+            //assert
+            serviceProcess.ReceivedWithAnyArgs(2).Process(Arg.Any<Event>());
         }
     }
 }

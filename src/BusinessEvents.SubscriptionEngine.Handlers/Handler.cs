@@ -28,7 +28,6 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
             foreach (var record in snsEvent.Records)
             {
-                Console.WriteLine($"The sns message received was - {record.Sns.Message}");
                 var @event = JsonConvert.DeserializeObject<Event>(record.Sns.Message);
                 serviceProcess.Process(@event);
             }
