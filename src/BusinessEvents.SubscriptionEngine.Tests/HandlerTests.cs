@@ -34,12 +34,14 @@ namespace BusinessEvents.SubscriptionEngine.Tests
         public async Task HandlePassesAllSnsRecordsToProcess()
         {
             // arrange
+            var defaultValidEvent = JsonConvert.SerializeObject(new Event() { Messages = new[] { new Message() } });
+
             var testSnsEvent = new SNSEvent
             {
                 Records = new List<SNSEvent.SNSRecord>
                 {
-                    new SNSEvent.SNSRecord {Sns = new SNSEvent.SNSMessage {Message = ""}},
-                    new SNSEvent.SNSRecord {Sns = new SNSEvent.SNSMessage {Message = ""}}
+                    new SNSEvent.SNSRecord {Sns = new SNSEvent.SNSMessage {Message = defaultValidEvent}},
+                    new SNSEvent.SNSRecord {Sns = new SNSEvent.SNSMessage {Message = defaultValidEvent}}
                 }
             };
 
@@ -75,6 +77,37 @@ namespace BusinessEvents.SubscriptionEngine.Tests
             CreateMock<IServiceProcess>();
             var deadLetterService = CreateMock<IDeadLetterService>();
             
+            Handler handler = CreateHandler();
+
+            //act
+            await handler.Handle(testSnsEvent);
+
+            //assert
+            await deadLetterService.ReceivedWithAnyArgs(1).Handle(Arg.Any<DeadLetterMessage>());
+        }
+
+        [Fact]
+        public async Task IfRecordIsNotIsInvalidJsonEnableMonitoring()
+        {
+            // arrange
+            var testSnsEvent = new SNSEvent
+            {
+                Records = new List<SNSEvent.SNSRecord>
+                {
+                    new SNSEvent.SNSRecord
+                    {
+                        Sns = new SNSEvent.SNSMessage
+                        {
+                            // message is an invalid json
+                            Message = "invalid json"
+                        }
+                    },
+                }
+            };
+
+            CreateMock<IServiceProcess>();
+            var deadLetterService = CreateMock<IDeadLetterService>();
+
             Handler handler = CreateHandler();
 
             //act
