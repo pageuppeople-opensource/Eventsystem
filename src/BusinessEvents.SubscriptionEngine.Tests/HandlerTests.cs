@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Amazon.Lambda.SNSEvents;
 using Autofac;
 using BusinessEvents.SubscriptionEngine.Core;
 using BusinessEvents.SubscriptionEngine.Handlers;
+using Newtonsoft.Json;
 using NSubstitute;
 using PageUp.Events;
 using Xunit;
@@ -12,48 +13,75 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 {
     public class HandlerTests : TestBase
     {
+        private readonly ContainerBuilder containerBuilder = new ContainerBuilder();
 
-        private IContainer CreateContainer(Action<ContainerBuilder> containerBuilderAction)
+        private T CreateMock<T>() where T: class
         {
-            var containerBuilder = new ContainerBuilder();
-            
-            containerBuilderAction(containerBuilder);
-            
-            return containerBuilder.Build();
+            var instance = Substitute.For<T>();
+            containerBuilder.RegisterInstance<T>(instance);
+
+            return instance;
         }
 
-        private Handler CreateHandler(IServiceProcess serviceProcess, ISubscriptionsManager subscriptionManager)
+        private Handler CreateHandler()
         {
-            var container = CreateContainer(delegate (ContainerBuilder builder)
-            {
-                builder.RegisterInstance(serviceProcess);
-                builder.RegisterInstance(subscriptionManager);
-            });
+            var handler = new Handler(containerBuilder.Build());
 
-            var handler = new Handler(container);
             return handler;
         }
 
         [Fact]
-        public void HandlePassesAllSnsRecordsToProcess()
+        public async Task HandlePassesAllSnsRecordsToProcess()
         {
             // arrange
-            var testSnsEvent = new SNSEvent();
-            testSnsEvent.Records = new List<SNSEvent.SNSRecord>
+            var testSnsEvent = new SNSEvent
             {
-                new SNSEvent.SNSRecord { Sns = new SNSEvent.SNSMessage { Message = ""} },
-                new SNSEvent.SNSRecord { Sns = new SNSEvent.SNSMessage { Message = ""} }
+                Records = new List<SNSEvent.SNSRecord>
+                {
+                    new SNSEvent.SNSRecord {Sns = new SNSEvent.SNSMessage {Message = ""}},
+                    new SNSEvent.SNSRecord {Sns = new SNSEvent.SNSMessage {Message = ""}}
+                }
             };
 
-            var serviceProcess = Substitute.For<IServiceProcess>();
-            var subscriptionManager = Substitute.For<ISubscriptionsManager>();
-            Handler handler = CreateHandler(serviceProcess, subscriptionManager);
+            var serviceProcess = CreateMock<IServiceProcess>();
+            var handler = CreateHandler();
 
             //act
-            handler.Handle(testSnsEvent);
+            await handler.Handle(testSnsEvent);
 
             //assert
-            serviceProcess.ReceivedWithAnyArgs(2).Process(Arg.Any<Event>());
+            await serviceProcess.ReceivedWithAnyArgs(2).Process(Arg.Any<Event>());
+        }
+
+        [Fact]
+        public async Task IfRecordIsNotAnEventEnableMonitoring()
+        {
+            // arrange
+            var testSnsEvent = new SNSEvent
+            {
+                Records = new List<SNSEvent.SNSRecord>
+                {
+                    new SNSEvent.SNSRecord
+                    {
+                        Sns = new SNSEvent.SNSMessage
+                        {
+                            // message is not an event.. it is just a random json object
+                            Message = JsonConvert.SerializeObject(new {blah = "blahblah"})
+                        }
+                    },
+                }
+            };
+
+            CreateMock<IServiceProcess>();
+            var deadLetterService = CreateMock<IDeadLetterService>();
+            
+            Handler handler = CreateHandler();
+
+            //act
+            await handler.Handle(testSnsEvent);
+
+            //assert
+            await deadLetterService.ReceivedWithAnyArgs(1).Handle(Arg.Any<DeadLetterMessage>());
         }
     }
 }

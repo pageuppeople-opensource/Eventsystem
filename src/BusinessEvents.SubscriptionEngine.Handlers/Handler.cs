@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SNSEvents;
@@ -22,15 +24,39 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             Container = container;
         }
 
-        public void Handle(SNSEvent snsEvent)
+        public async Task Handle(SNSEvent snsEvent)
         {
             var serviceProcess = Container.Resolve<IServiceProcess>();
 
             foreach (var record in snsEvent.Records)
             {
-                var @event = JsonConvert.DeserializeObject<Event>(record.Sns.Message);
-                serviceProcess.Process(@event);
+                Event @event;
+                var message = record.Sns.Message;
+
+                try
+                {
+                    @event = JsonConvert.DeserializeObject<Event>(message);
+
+                    if(@event?.Messages == null || @event.Messages.Length < 1)
+                    {
+                        await MarkAsDeadLetter(message);
+                        continue;
+                    }
+                }
+                catch (JsonException jsonException)
+                {
+                    await MarkAsDeadLetter(message, jsonException);
+                    continue;
+                }
+
+                await serviceProcess.Process(@event);
             }
+        }
+
+        private async Task MarkAsDeadLetter(string message, JsonException jsonException = null)
+        {
+            var deadLetterService = Container.Resolve<IDeadLetterService>();
+            await deadLetterService.Handle(new DeadLetterMessage { Message = message, Exception = jsonException });
         }
 
         public APIGatewayProxyResponse HealthCheck(APIGatewayProxyRequest request, ILambdaContext context)
@@ -46,5 +72,17 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                 Body = "OK"
             };
         }
+    }
+
+    public interface IDeadLetterService
+    {
+        Task Handle(DeadLetterMessage snsMessage);
+    }
+
+    public class DeadLetterMessage
+    {
+        public string Message { get; set; }
+
+        public Exception Exception { get; set; }
     }
 }
