@@ -1,21 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyTitle>Serverless.Dotnet.Core</AssemblyTitle>
-    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <AssemblyTitle>BusinessEvents.SubscriptionEngine.Core</AssemblyTitle>
+    <TargetFramework>netstandard1.4</TargetFramework>
     <AssemblyName>BusinessEvents.SubscriptionEngine.Core</AssemblyName>
-    <PackageId>Core</PackageId>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <RootNamespace>BusinessEvents.SubscriptionEngine.Core</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.4.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="8.0.3" />
+    <PackageReference Include="Autofac" Version="4.6.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="PageUp.Events" Version="1.0.0" />
   </ItemGroup>

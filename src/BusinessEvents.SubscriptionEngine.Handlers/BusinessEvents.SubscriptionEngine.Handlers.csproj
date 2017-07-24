@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyTitle>Serverless.Dotnet.Handlers</AssemblyTitle>
+    <AssemblyTitle>BusinessEvents.SubscriptionEngine.Handlers</AssemblyTitle>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <AssemblyName>BusinessEvents.SubscriptionEngine.Handlers</AssemblyName>
     <PackageId>Handlers</PackageId>
@@ -15,13 +15,11 @@
 
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.SNSEvents" Version="1.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
     <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0*" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.1.0" />
     <PackageReference Include="Amazon.Lambda.Tools" Version="1.0.0-preview1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Autofac" Version="4.4.0" />
     <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="1.1.0" />
     <PackageReference Include="PageUp.Events" Version="1.0.0" />
   </ItemGroup>
@@ -31,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BusinessEvents.SubscriptionEngine.DeadLetterManagement\BusinessEvents.SubscriptionEngine.DeadLetterManagement.csproj" />
     <ProjectReference Include="..\BusinessEvents.SubscriptionEngine.Core\BusinessEvents.SubscriptionEngine.Core.csproj" />
   </ItemGroup>
 

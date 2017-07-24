@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SNSEvents;
 using Autofac;
 using BusinessEvents.SubscriptionEngine.Core;
+using BusinessEvents.SubscriptionEngine.DeadLetterManagement;
 using Newtonsoft.Json;
 using PageUp.Events;
 
@@ -72,17 +71,5 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                 Body = "OK"
             };
         }
-    }
-
-    public interface IDeadLetterService
-    {
-        Task Handle(DeadLetterMessage snsMessage);
-    }
-
-    public class DeadLetterMessage
-    {
-        public string Message { get; set; }
-
-        public Exception Exception { get; set; }
     }
 }

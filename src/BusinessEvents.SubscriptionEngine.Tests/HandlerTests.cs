@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Amazon.Lambda.SNSEvents;
 using Autofac;
 using BusinessEvents.SubscriptionEngine.Core;
+using BusinessEvents.SubscriptionEngine.DeadLetterManagement;
 using BusinessEvents.SubscriptionEngine.Handlers;
 using Newtonsoft.Json;
 using NSubstitute;
