@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PageUp.Events;
@@ -30,11 +31,10 @@ namespace BusinessEvents.SubscriptionEngine.Core
         private async Task NotifySubscribers(Subscription[] subscribers, Message eventMessage)
         {
             foreach (var subscription in subscribers)
-            {
+            {   
                 using (var httpclient = new HttpClient())
                 {
-                    await httpclient.PostAsync(subscription.Endpoint,
-                        new StringContent($"payload={JsonConvert.SerializeObject(new { text = JsonConvert.SerializeObject(eventMessage) })}" ));
+                    await httpclient.PostAsync(subscription.Endpoint, new StringContent(JsonConvert.SerializeObject(eventMessage), Encoding.UTF8, "application/json"));
                 }
             }
         }

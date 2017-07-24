@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using BusinessEvents.SubscriptionEngine.Core;
+﻿using System.Threading.Tasks;
 
 namespace BusinessEvents.SubscriptionEngine.DeadLetterManagement
 {
@@ -8,7 +6,7 @@ namespace BusinessEvents.SubscriptionEngine.DeadLetterManagement
     {
         public Task Handle(DeadLetterMessage snsMessage)
         {
-            throw new System.NotImplementedException();
+            return null;
         }
     }
 }

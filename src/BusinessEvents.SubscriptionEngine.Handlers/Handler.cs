@@ -23,12 +23,12 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             Container = container;
         }
 
-        public async Task Handle(SNSEvent snsEvent)
+        public async Task Handle(SNSEvent snsEvent, ILambdaContext lambdaContext = null)
         {
             var serviceProcess = Container.Resolve<IServiceProcess>();
 
             foreach (var record in snsEvent.Records)
-            {
+            {   
                 Event @event;
                 var message = record.Sns.Message;
 
