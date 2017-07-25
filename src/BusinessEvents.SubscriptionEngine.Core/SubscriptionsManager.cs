@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Net.Http;
+using PageUp.Events;
 
 namespace BusinessEvents.SubscriptionEngine.Core
 {
@@ -11,10 +12,46 @@ namespace BusinessEvents.SubscriptionEngine.Core
             var subscriptions = new List<Subscription>();
 
             // This is a slack weebhook that writes
-            subscriptions.Add(new Subscription() { Endpoint = new Uri("https://hooks.slack.com/services/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"), BusinessEvent = "offer-accepted" });
+            subscriptions.Add(new Subscription()
+            {
+                Endpoint = new Uri("https://hooks.slack.com/services/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"),
+                BusinessEvent = "offer-accepted"
+            });
 
             return subscriptions.ToArray();
         }
+
+        public string RecordErrorForSubscriber(Subscription subscriber, Message eventMessage, Event @event,
+            HttpResponseMessage response)
+        {
+            var errorMessage = ConstructErrorMessage(subscriber, eventMessage,
+                $"{response.StatusCode + " " + response.ReasonPhrase + " " + response.Content.ReadAsStringAsync().Result }");
+            
+            Console.WriteLine(errorMessage);
+
+            return errorMessage;
+        }
+
+        public string RecordErrorForSubscriber(Subscription subscriber, Message eventMessage, Event @event, Exception exception)
+        {
+            var errorMessage = ConstructErrorMessage(subscriber, eventMessage,
+                exception.InnerException?.Message ?? exception.Message);
+
+            Console.WriteLine(errorMessage);
+
+            return errorMessage;
+        }
+
+        private static string ConstructErrorMessage(Subscription subscriber, Message eventMessage, string errorMessage)
+        {
+            return $"Subscriber with endpoint: {subscriber.Endpoint} \n" +
+                   $"failed recieving message of type: {eventMessage.Header.MessageType} \n" +
+                   $"with error: {errorMessage}";
+        }
+    }
+
+    public interface ISubscriptionRepository
+    {
     }
 
     public class Subscription

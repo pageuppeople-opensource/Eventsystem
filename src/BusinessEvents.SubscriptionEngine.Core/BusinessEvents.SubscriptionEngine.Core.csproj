@@ -14,4 +14,10 @@
     <PackageReference Include="PageUp.Events" Version="1.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System.Threading.Tasks.Parallel">
+      <HintPath>..\..\..\..\.nuget\packages\system.threading.tasks.parallel\4.0.1\ref\netstandard1.1\System.Threading.Tasks.Parallel.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
