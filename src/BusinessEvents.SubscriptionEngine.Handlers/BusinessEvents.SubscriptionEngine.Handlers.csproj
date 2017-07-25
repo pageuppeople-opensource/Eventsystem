@@ -4,8 +4,8 @@
     <AssemblyTitle>BusinessEvents.SubscriptionEngine.Handlers</AssemblyTitle>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <AssemblyName>BusinessEvents.SubscriptionEngine.Handlers</AssemblyName>
-    <PackageId>Handlers</PackageId>
-    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
+    <PackageId>BusinessEvents.SubscriptionEngine.Handlers</PackageId>
+    <RuntimeFrameworkVersion>1.1.0</RuntimeFrameworkVersion>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -17,7 +17,7 @@
     <PackageReference Include="Amazon.Lambda.SNSEvents" Version="1.0.0" />
     <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0*" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.1.0" />
-    <PackageReference Include="Amazon.Lambda.Tools" Version="1.0.0-preview1">
+    <PackageReference Include="Amazon.Lambda.Tools" Version="1.6.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="1.1.0" />
@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Amazon.Lambda.Tools" Version="0.9.0-preview1" />
+    <DotNetCliToolReference Include="Amazon.Lambda.Tools" Version="1.6.0" />
   </ItemGroup>
 
   <ItemGroup>

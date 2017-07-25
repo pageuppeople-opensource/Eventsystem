@@ -6,7 +6,7 @@ using Xunit;
 
 namespace BusinessEvents.SubscriptionEngine.Tests
 {
-    public class SlackNotifierTests: TestBase
+    public class NotifierTests: TestBase
     {
         [Fact]
         public async void PostsToSlack()
@@ -21,6 +21,23 @@ namespace BusinessEvents.SubscriptionEngine.Tests
             var testEvent = Event.CreateEvent("isntanceid", "messagetype", "userid", new { contentbody = "contentbody" }, null, "someorigin");
 
             var notifier = new SlackNotifier(CreateMock<ISubscriptionsManager>());
+
+            await notifier.Notify(slackSubscription, testEvent.Messages[0], testEvent);
+        }
+
+        [Fact]
+        public async void PostsToWebEndpoint()
+        {
+            var slackSubscription = new Subscription()
+            {
+                Type = SubscriptionType.Default,
+                Endpoint = new Uri("https://requestb.in/1hb5s151"),
+                BusinessEvent = "*"
+            };
+
+            var testEvent = Event.CreateEvent("isntanceid", "messagetype", "userid", new { contentbody = "contentbody" }, null, "someorigin");
+
+            var notifier = new DefaultNotifier(CreateMock<ISubscriptionsManager>());
 
             await notifier.Notify(slackSubscription, testEvent.Messages[0], testEvent);
         }
