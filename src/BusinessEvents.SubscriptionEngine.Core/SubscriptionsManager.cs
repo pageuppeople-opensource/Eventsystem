@@ -9,14 +9,27 @@ namespace BusinessEvents.SubscriptionEngine.Core
     {
         public Subscription[] GetSubscriptionsFor(string businessEvent)
         {
-            var subscriptions = new List<Subscription>();
-
-            // This is a slack weebhook that writes
-            subscriptions.Add(new Subscription()
+            var subscriptions = new List<Subscription>
             {
-                Endpoint = new Uri("https://hooks.slack.com/services/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"),
-                BusinessEvent = "offer-accepted"
-            });
+                // This is a slack weebhook that writes
+                new Subscription()
+                {
+                    Type = SubscriptionType.Slack,
+                    Endpoint = new Uri("https://hooks.slack.com/services/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"),
+                    BusinessEvent = "*"
+                },
+                new Subscription()
+                {
+                    Type = SubscriptionType.Telemetry,
+                    BusinessEvent = "*"
+                },
+                new Subscription()
+                {
+                    Type = SubscriptionType.Default,
+                    Endpoint = new Uri("https://requestb.in/1hb5s151"),
+                    BusinessEvent = "offer-accepted"
+                }
+            };
 
             return subscriptions.ToArray();
         }
@@ -50,6 +63,13 @@ namespace BusinessEvents.SubscriptionEngine.Core
         }
     }
 
+    public enum SubscriptionType
+    {
+        Slack,
+        Telemetry,
+        Default
+    }
+
     public interface ISubscriptionRepository
     {
     }
@@ -58,5 +78,6 @@ namespace BusinessEvents.SubscriptionEngine.Core
     {
         public Uri Endpoint { get; set; }
         public string BusinessEvent { get; set; }
+        public SubscriptionType Type { get; set; }
     }
 }

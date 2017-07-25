@@ -1,9 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using System.Threading.Tasks;
+using Autofac.Features.Indexed;
+using BusinessEvents.SubscriptionEngine.Core.Notifiers;
 using PageUp.Events;
 
 namespace BusinessEvents.SubscriptionEngine.Core
@@ -16,10 +13,12 @@ namespace BusinessEvents.SubscriptionEngine.Core
     public class ServiceProcess : IServiceProcess
     {
         private readonly ISubscriptionsManager subscriptionsManager;
+        private readonly IIndex<SubscriptionType, INotifier> notifierFactory;
 
-        public ServiceProcess(ISubscriptionsManager subscriptionsManager)
+        public ServiceProcess(ISubscriptionsManager subscriptionsManager, IIndex<SubscriptionType, INotifier> notifierFactory)
         {
             this.subscriptionsManager = subscriptionsManager;
+            this.notifierFactory = notifierFactory;
         }
         public async Task Process(Event @event)
         {
@@ -34,22 +33,8 @@ namespace BusinessEvents.SubscriptionEngine.Core
         {   
             var result = await Task.Factory.StartNew(() => Parallel.ForEach(subscribers, subscriber =>
             {
-                using (var httpclient = new HttpClient())
-                {
-                    try
-                    {
-                        var response = httpclient.PostAsync(subscriber.Endpoint, new StringContent(JsonConvert.SerializeObject(eventMessage), Encoding.UTF8, "application/json")).Result;
-
-                        if(!response.IsSuccessStatusCode)
-                        {
-                            subscriptionsManager.RecordErrorForSubscriber(subscriber, eventMessage, @event, response);
-                        }
-                    }
-                    catch (Exception exception)
-                    {
-                        subscriptionsManager.RecordErrorForSubscriber(subscriber, eventMessage, @event, exception);
-                    }
-                }
+                var notifier = notifierFactory[subscriber.Type];
+                notifier.Notify(subscriber, eventMessage, @event).RunSynchronously();
             }));
 
             return result.IsCompleted;

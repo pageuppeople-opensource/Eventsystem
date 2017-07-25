@@ -14,19 +14,9 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 {
     public class HandlerTests : TestBase
     {
-        private readonly ContainerBuilder containerBuilder = new ContainerBuilder();
-
-        private T CreateMock<T>() where T: class
-        {
-            var instance = Substitute.For<T>();
-            containerBuilder.RegisterInstance<T>(instance);
-
-            return instance;
-        }
-
         private Handler CreateHandler()
         {
-            var handler = new Handler(containerBuilder.Build());
+            var handler = new Handler(ContainerBuilder.Build());
 
             return handler;
         }
@@ -116,34 +106,6 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 
             //assert
             await deadLetterService.ReceivedWithAnyArgs(1).Handle(Arg.Any<DeadLetterMessage>());
-        }
-
-        [Fact]
-        public async Task NotifiesASubscriber()
-        {
-            var testSnsEvent = new SNSEvent
-            {
-                Records = new List<SNSEvent.SNSRecord>
-                {
-                    new SNSEvent.SNSRecord
-                    {
-                        Sns = new SNSEvent.SNSMessage
-                        {
-                            // valid message
-                            Message = "{\"Header\":{\"UserId\":\"userId\",\"TransportTimeStamp\":\"2017-07-21T00:28:54.2282942Z\",\"Metadata\":{\"metaheader1\":\"metaheadervalue1\"},\"Origin\":\"origin\",\"InstanceId\":\"instanceId\",\"CorrelationId\":\"d3e35fe4-ad84-46c0-b54f-3a6dc779630d\"},\"Messages\":[{\"Header\":{\"Metadata\":null,\"MessageType\":\"messagetype\",\"MessageId\":\"a9757a12-a80e-4e32-9bab-e3d65a4b3a92\"},\"Body\":{\"contents\":\"bodycontents\"}}]}"
-                        }
-                    },
-                }
-            };
-
-            containerBuilder.RegisterType<ServiceProcess>().As<IServiceProcess>();
-            containerBuilder.RegisterType<SubscriptionsManager>().As<ISubscriptionsManager>();
-            CreateMock<IDeadLetterService>();
-
-            Handler handler = CreateHandler();
-
-            //act
-            await handler.Handle(testSnsEvent);
         }
     }
 }
