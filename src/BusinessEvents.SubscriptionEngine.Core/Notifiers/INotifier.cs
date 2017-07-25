@@ -5,6 +5,6 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 {
     public interface INotifier
     {
-        Task Notify(Subscription subscription, Message message, Event @event);
+        Task Notify(Subscription subscriber, Message message, Event @event);
     }
 }

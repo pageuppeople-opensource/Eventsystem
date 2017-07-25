@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Newtonsoft.Json;
 using PageUp.Events;
 
 namespace BusinessEvents.SubscriptionEngine.Core
@@ -79,5 +80,13 @@ namespace BusinessEvents.SubscriptionEngine.Core
         public Uri Endpoint { get; set; }
         public string BusinessEvent { get; set; }
         public SubscriptionType Type { get; set; }
+        public Auth Auth { get; set; }
+    }
+
+    public struct Auth
+    {
+        public Uri Endpoint { get; set; }
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
     }
 }

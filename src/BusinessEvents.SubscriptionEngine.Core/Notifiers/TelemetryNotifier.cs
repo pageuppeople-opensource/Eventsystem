@@ -6,7 +6,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 {
     public class TelemetryNotifier : INotifier
     {
-        public Task Notify(Subscription subscription, Message message, Event @event)
+        public Task Notify(Subscription subscriber, Message message, Event @event)
         {
             return Task.Factory.StartNew(() =>
             {
