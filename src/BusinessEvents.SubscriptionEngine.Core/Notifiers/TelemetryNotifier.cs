@@ -1,6 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using PageUp.Events;
+using PageUp.Telemetry;
 
 namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 {
@@ -8,7 +8,12 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
     {
         public Task Notify(Subscription subscription, Message message, Event @event)
         {
-            throw new NotImplementedException();
+            return Task.Factory.StartNew(() =>
+            {
+                var telemetryService = new TelemetryService();
+                telemetryService.LogTelemetry(@event.Header.InstanceId, "business-event", message.Header.MessageType,
+                    message.Header);
+            });
         }
     }
 }
