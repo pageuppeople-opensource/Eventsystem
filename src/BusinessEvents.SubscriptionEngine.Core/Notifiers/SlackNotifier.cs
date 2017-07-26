@@ -38,6 +38,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
                 catch (Exception exception)
                 {
                     subscriptionsManager.RecordErrorForSubscriber(subscriber, message, @event, exception);
+                    throw;
                 }
             }
         }

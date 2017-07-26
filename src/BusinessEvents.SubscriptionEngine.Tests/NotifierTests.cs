@@ -41,5 +41,28 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 
             await notifier.Notify(slackSubscription, testEvent.Messages[0], testEvent);
         }
+
+        [Fact]
+        public async void AuthenticatedNotiferPosts()
+        {
+            var slackSubscription = new Subscription()
+            {
+                Type = SubscriptionType.Default,
+                Endpoint = new Uri("https://requestb.in/1hb5s151"),
+                BusinessEvent = "*",
+                Auth = new Auth
+                {
+                    Endpoint = new Uri("http://localhost:4050/connect/token"),
+                    ClientId = "testclient",
+                    ClientSecret = "verysecret"
+                }
+            };
+
+            var testEvent = Event.CreateEvent("isntanceid", "messagetype", "userid", new { contentbody = "contentbody" }, null, "someorigin");
+
+            var notifier = new AuthenticatedNotifier(new AuthenticationModule(), CreateMock<SubscriptionsManager>());
+
+            await notifier.Notify(slackSubscription, testEvent.Messages[0], testEvent);
+        }
     }
 }

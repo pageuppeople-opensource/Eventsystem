@@ -34,7 +34,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
                     { "client_secret", subscription.Auth.ClientSecret },
                     { "grant_type", "client_credentials" },
                     { "scope", "Subscription.Notify" },
-                    { "instanceId", "0" }
+                    { "instanceId", "0" } //TODO: need to remove this once identitylocal is not forcing me with this.
                 })
             };
 
@@ -45,7 +45,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 
                 var payload = JObject.Parse(await response.Content.ReadAsStringAsync());
 
-                authContent = (scheme: payload.Value<string>("scheme"), token: payload.Value<string>("access_token"));
+                authContent = (scheme: payload.Value<string>("token_type"), token: payload.Value<string>("access_token"));
             }
 
             return authContent;

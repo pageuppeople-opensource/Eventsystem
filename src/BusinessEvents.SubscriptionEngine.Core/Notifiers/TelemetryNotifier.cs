@@ -12,7 +12,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
             {
                 var telemetryService = new TelemetryService();
                 telemetryService.LogTelemetry(@event.Header.InstanceId, "business-event", message.Header.MessageType,
-                    message.Header);
+                new { MessageHeader = message.Header, EventHeader = @event.Header });
             });
         }
     }
