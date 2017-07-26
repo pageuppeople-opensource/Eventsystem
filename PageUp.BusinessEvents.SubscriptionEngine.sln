@@ -8,9 +8,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D4D35B5-177A-439F-AAAA-AF29F41BD49B}"
 	ProjectSection(SolutionItems) = preProject
 		.travis.yml = .travis.yml
+		authlocal\Data\auth-data.json = authlocal\Data\auth-data.json
 		build.ps1 = build.ps1
 		build.sh = build.sh
 		deploy.sh = deploy.sh
+		docker-compose.yml = docker-compose.yml
 		README.md = README.md
 		serverless.yml = serverless.yml
 	EndProjectSection
@@ -21,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.Subscription
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine.Tests", "src\BusinessEvents.SubscriptionEngine.Tests\BusinessEvents.SubscriptionEngine.Tests.csproj", "{D3C1B13D-6650-4208-B592-A0AF15CF8DB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.SubscriptionEngine.DeadLetterManagement", "BusinessEvents.SubscriptionEngine.DeadLetterManagement\BusinessEvents.SubscriptionEngine.DeadLetterManagement.csproj", "{7860372A-6DCD-4C97-96E0-B08C35C39DB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine.DeadLetterManagement", "BusinessEvents.SubscriptionEngine.DeadLetterManagement\BusinessEvents.SubscriptionEngine.DeadLetterManagement.csproj", "{7860372A-6DCD-4C97-96E0-B08C35C39DB6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,1 @@
+FROM pageup/identityserver-local

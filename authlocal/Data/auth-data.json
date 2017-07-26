@@ -1,0 +1,22 @@
+{
+    "apiResources": [
+        {
+            "name": "Subscription.Notify",
+            "displayName": "Subscription notification access"
+        }
+    ],
+    "clients": [
+        {
+            "clientId": "testclient",
+            "allowedGrantType": "ClientCredentials",
+            "clientSecrets": [ "verysecret" ],
+            "allowedScopes": [ "Subscription.Notify" ],
+            "claims": [
+                {
+                    "name": "instanceid",
+                    "value": "0"
+                }
+            ]
+        }
+    ]
+}

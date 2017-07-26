@@ -1,0 +1,4 @@
+authlocal:
+  build: authlocal  
+  ports:
+    - "4050:4050"

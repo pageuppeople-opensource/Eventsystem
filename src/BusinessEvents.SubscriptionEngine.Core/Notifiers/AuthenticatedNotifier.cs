@@ -30,7 +30,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 
             try
             {
-                async Task<HttpResponseMessage> PostFunc(string validToken)
+                async Task<HttpResponseMessage> PostFunc((string scheme, string token) validToken)
                 {
                     var request = new HttpRequestMessage()
                     {
@@ -40,7 +40,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
                         Method = HttpMethod.Post,
                         Headers =
                         {
-                            Authorization = new AuthenticationHeaderValue("Bearer", validToken)
+                            Authorization = new AuthenticationHeaderValue(validToken.scheme, validToken.token)
                         },
                     };
                     using (var httpclient = new HttpClient())
