@@ -26,7 +26,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
                 new Subscription()
                 {
                     Type = SubscriptionType.Default,
-                    Endpoint = new Uri("https://requestb.in/1hb5s151"),
+                    Endpoint = new Uri("https://requestb.in/19swc1r1"),
                     BusinessEvent = "offer-accepted"
                 }
             };

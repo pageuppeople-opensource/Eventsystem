@@ -51,4 +51,4 @@ Slack posts to the channel called [pageup/business-events](https://pageup.slack.
 
 ### Default notifier - http notification
 
-This posts to the [requestbin](https://requestb.in/1hb5s151?inspect)
+This posts to the [requestbin](https://requestb.in/19swc1r1?inspect)

@@ -15,7 +15,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
             var module = new AuthenticationModule();
             var subscription = new Subscription
             {
-                Endpoint = new Uri("https://requestb.in/1hb5s151"),
+                Endpoint = new Uri("https://requestb.in/19swc1r1"),
                 Auth = new Auth
                 {
                     Endpoint = new Uri("http://localhost:4050/connect/token"),

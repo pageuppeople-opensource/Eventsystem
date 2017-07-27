@@ -31,7 +31,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
             var slackSubscription = new Subscription()
             {
                 Type = SubscriptionType.Default,
-                Endpoint = new Uri("https://requestb.in/1hb5s151"),
+                Endpoint = new Uri("https://requestb.in/19swc1r1"),
                 BusinessEvent = "*"
             };
 
@@ -48,7 +48,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
             var slackSubscription = new Subscription()
             {
                 Type = SubscriptionType.Default,
-                Endpoint = new Uri("https://requestb.in/1hb5s151"),
+                Endpoint = new Uri("https://requestb.in/19swc1r1"),
                 BusinessEvent = "*",
                 Auth = new Auth
                 {
