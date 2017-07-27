@@ -34,7 +34,9 @@ namespace BusinessEvents.SubscriptionEngine.Core
             var result = await Task.Factory.StartNew(() => Parallel.ForEach(subscribers, subscriber =>
             {
                 var notifier = notifierFactory[subscriber.Type];
-                notifier.Notify(subscriber, eventMessage, @event).RunSynchronously();
+
+                var task = Task.Run(async () => { await notifier.Notify(subscriber, eventMessage, @event); });
+                task.Wait();
             }));
 
             return result.IsCompleted;
