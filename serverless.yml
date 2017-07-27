@@ -11,6 +11,11 @@ provider:
       Resource: "*"
       Action:
         - "sns:*"
+        - "logs:CreateLogGroup"
+        - "logs:CreateLogStream"
+        - "logs:PutLogEvents"
+        - "logs:DescribeLogGroups"
+        - "logs:DescribeLogStreams"
 
 package:
   artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.0/publish/deploy-package.zip
