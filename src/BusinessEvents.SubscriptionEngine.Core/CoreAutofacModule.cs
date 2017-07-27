@@ -17,7 +17,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             builder.RegisterType<TelemetryNotifier>().Keyed<INotifier>(SubscriptionType.Telemetry);
             builder.RegisterType<SlackNotifier>().Keyed<INotifier>(SubscriptionType.Slack);
             builder.RegisterType<WebhookNotifier>().Keyed<INotifier>(SubscriptionType.Webhook);
-            builder.RegisterType<AuthenticatedNotifier>().Keyed<INotifier>(SubscriptionType.Default);
+            builder.RegisterType<AuthenticatedWebhookNotifier>().Keyed<INotifier>(SubscriptionType.AuthenticatedWebhook);
         }
     }
 }

@@ -10,12 +10,12 @@ using PageUp.Events;
 
 namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 {
-    public class AuthenticatedNotifier : INotifier
+    public class AuthenticatedWebhookNotifier : INotifier
     {
         private readonly IAuthenticationModule authenticationModule;
         private readonly ISubscriptionsManager subscriptionsManager;
 
-        public AuthenticatedNotifier(IAuthenticationModule authenticationModule,
+        public AuthenticatedWebhookNotifier(IAuthenticationModule authenticationModule,
             ISubscriptionsManager subscriptionsManager)
         {
             this.authenticationModule = authenticationModule;

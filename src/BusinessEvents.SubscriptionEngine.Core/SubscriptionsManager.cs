@@ -31,7 +31,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
                 },
                 new Subscription()
                 {
-                    Type = SubscriptionType.Default,
+                    Type = SubscriptionType.AuthenticatedWebhook,
                     Endpoint = new Uri("https://requestb.in/19swc1r1"),
                     BusinessEvent = "*",
                     Auth = new Auth
@@ -77,7 +77,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
 
     public enum SubscriptionType
     {
-        Default,
+        AuthenticatedWebhook,
         Slack,
         Telemetry,
         Webhook

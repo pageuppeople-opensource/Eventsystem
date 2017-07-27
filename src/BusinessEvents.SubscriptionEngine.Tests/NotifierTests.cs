@@ -47,7 +47,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
         {
             var slackSubscription = new Subscription()
             {
-                Type = SubscriptionType.Default,
+                Type = SubscriptionType.AuthenticatedWebhook,
                 Endpoint = new Uri("https://requestb.in/19swc1r1"),
                 BusinessEvent = "*",
                 Auth = new Auth
@@ -60,7 +60,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 
             var testEvent = Event.CreateEvent("isntanceid", "messagetype", "userid", new { contentbody = "contentbody" }, null, "someorigin");
 
-            var notifier = new AuthenticatedNotifier(new AuthenticationModule(), CreateMock<SubscriptionsManager>());
+            var notifier = new AuthenticatedWebhookNotifier(new AuthenticationModule(), CreateMock<SubscriptionsManager>());
 
             await notifier.Notify(slackSubscription, testEvent.Messages[0], testEvent);
         }
