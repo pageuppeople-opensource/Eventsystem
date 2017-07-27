@@ -28,8 +28,36 @@ Use the following command for bash.
 
 ## Test
 To run unit tests
+
+Bring the docker container up. This will bring up local authentication server
+```
+docker-compose build
+docker-compose up -d
+```
+Now run test
 ```
 dotnet test .\src\BusinessEvents.SubscriptionEngine.Tests\BusinessEvents.SubscriptionEngine.Tests.csproj
+```
+
+## Testing notifier
+
+### Slack 
+
+Slack posts to the channel called [pageup/business-events](https://pageup.slack.com/messages/C6BMM1UNN)
+
+### Webhook notifier
+
+This posts to the [requestbin](https://requestb.in/19swc1r1?inspect)
+
+### Authenticated webhook notifier
+
+Also posts to [requestbin](https://requestb.in/19swc1r1?inspect). Not the authentication header.
+Currently authenticated webhook notifier does not work in DC0. Auth server and credentials are not configured.
+
+### Test data to pass to sns
+
+```
+{"Header":{"UserId":"userId","TransportTimeStamp":"2017-07-21T00:28:54.2282942Z","Metadata":{"metaheader1":"metaheadervalue1"},"Origin":"origin","InstanceId":"instanceId","CorrelationId":"d3e35fe4-ad84-46c0-b54f-3a6dc779630d"},"Messages":[{"Header":{"Metadata":null,"MessageType":"messagetype","MessageId":"a9757a12-a80e-4e32-9bab-e3d65a4b3a92"},"Body":{"contents":"bodycontents"}}]}
 ```
 
 ## Deploy
@@ -37,18 +65,3 @@ dotnet test .\src\BusinessEvents.SubscriptionEngine.Tests\BusinessEvents.Subscri
 serverless deploy
 ```
 
-## Test data to pass to sns
-
-```
-{"Header":{"UserId":"userId","TransportTimeStamp":"2017-07-21T00:28:54.2282942Z","Metadata":{"metaheader1":"metaheadervalue1"},"Origin":"origin","InstanceId":"instanceId","CorrelationId":"d3e35fe4-ad84-46c0-b54f-3a6dc779630d"},"Messages":[{"Header":{"Metadata":null,"MessageType":"messagetype","MessageId":"a9757a12-a80e-4e32-9bab-e3d65a4b3a92"},"Body":{"contents":"bodycontents"}}]}
-```
-
-## Testing notifiers
-
-### Slack 
-
-Slack posts to the channel called [pageup/business-events](https://pageup.slack.com/messages/C6BMM1UNN)
-
-### Default notifier - http notification
-
-This posts to the [requestbin](https://requestb.in/19swc1r1?inspect)
