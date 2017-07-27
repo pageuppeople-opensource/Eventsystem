@@ -7,11 +7,11 @@ using PageUp.Events;
 
 namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 {
-    public class DefaultNotifier : INotifier
+    public class WebhookNotifier : INotifier
     {
         private readonly ISubscriptionsManager subscriptionsManager;
 
-        public DefaultNotifier(ISubscriptionsManager subscriptionsManager)
+        public WebhookNotifier(ISubscriptionsManager subscriptionsManager)
         {
             this.subscriptionsManager = subscriptionsManager;
         }

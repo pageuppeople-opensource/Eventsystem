@@ -29,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BusinessEvents.SubscriptionEngine.DeadLetterManagement\BusinessEvents.SubscriptionEngine.DeadLetterManagement.csproj" />
     <ProjectReference Include="..\BusinessEvents.SubscriptionEngine.Core\BusinessEvents.SubscriptionEngine.Core.csproj" />
   </ItemGroup>
 

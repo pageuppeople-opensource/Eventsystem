@@ -30,14 +30,14 @@ namespace BusinessEvents.SubscriptionEngine.Tests
         {
             var slackSubscription = new Subscription()
             {
-                Type = SubscriptionType.Default,
+                Type = SubscriptionType.Webhook,
                 Endpoint = new Uri("https://requestb.in/19swc1r1"),
                 BusinessEvent = "*"
             };
 
             var testEvent = Event.CreateEvent("isntanceid", "messagetype", "userid", new { contentbody = "contentbody" }, null, "someorigin");
 
-            var notifier = new DefaultNotifier(CreateMock<ISubscriptionsManager>());
+            var notifier = new WebhookNotifier(CreateMock<ISubscriptionsManager>());
 
             await notifier.Notify(slackSubscription, testEvent.Messages[0], testEvent);
         }
