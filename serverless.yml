@@ -16,6 +16,9 @@ provider:
         - "logs:PutLogEvents"
         - "logs:DescribeLogGroups"
         - "logs:DescribeLogStreams"
+        - "s3:PutObject"
+        - "s3:GetObject"
+        - "s3:PutBucket"
 
 package:
   artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.0/publish/deploy-package.zip
