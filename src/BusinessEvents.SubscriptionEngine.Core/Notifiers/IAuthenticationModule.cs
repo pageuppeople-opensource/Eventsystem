@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
@@ -25,12 +26,18 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 
         public async Task<(string scheme, string token)> RenewToken(Subscription subscription, CancellationToken cancellationToken)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, subscription.Auth.Endpoint)
+            var auth = subscription.Auth ?? new Auth
+            {
+                ClientId = Environment.GetEnvironmentVariable("AUTH_CLIENT_ID"),
+                ClientSecret = Environment.GetEnvironmentVariable("AUTH_CLIENT_SECRET"),
+                Endpoint = new Uri(Environment.GetEnvironmentVariable("AUTH_ENDPOINT"))
+            };
+            var request = new HttpRequestMessage(HttpMethod.Post, auth.Endpoint)
             {
                 Content = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
-                    { "client_id", subscription.Auth.ClientId },
-                    { "client_secret", subscription.Auth.ClientSecret },
+                    { "client_id", auth.ClientId },
+                    { "client_secret", auth.ClientSecret },
                     { "grant_type", "client_credentials" },
                     { "scope", "Subscription.Notify" },
                     { "instanceId", "0" } //TODO: need to remove this once identitylocal is not forcing me with this.

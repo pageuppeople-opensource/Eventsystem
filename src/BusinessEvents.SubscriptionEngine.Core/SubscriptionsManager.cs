@@ -84,7 +84,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
         public Auth Auth { get; set; }
     }
 
-    public struct Auth
+    public class Auth
     {
         public Uri Endpoint { get; set; }
         public string ClientId { get; set; }
