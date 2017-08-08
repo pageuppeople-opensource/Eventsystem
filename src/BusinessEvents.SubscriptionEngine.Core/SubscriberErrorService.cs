@@ -5,7 +5,7 @@ using PageUp.Telemetry;
 
 namespace BusinessEvents.SubscriptionEngine.Core
 {
-    public class SubscriberErrorService
+    public class SubscriberErrorService: ISubscriberErrorService
     {
         public string RecordErrorForSubscriber(Subscription subscriber, Message eventMessage, Event @event,
             HttpResponseMessage response)
