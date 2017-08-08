@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BusinessEvents.SubscriptionEngine.DeadLetterManagement
+namespace BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement
 {
     public class DeadLetterMessage
     {

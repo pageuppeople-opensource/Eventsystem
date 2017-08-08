@@ -1,6 +1,6 @@
 ﻿using Autofac;
+using BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement;
 using BusinessEvents.SubscriptionEngine.Core.Notifiers;
-using BusinessEvents.SubscriptionEngine.DeadLetterManagement;
 
 namespace BusinessEvents.SubscriptionEngine.Core
 {

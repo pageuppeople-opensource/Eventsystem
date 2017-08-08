@@ -5,7 +5,7 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.SNSEvents;
 using Autofac;
 using BusinessEvents.SubscriptionEngine.Core;
-using BusinessEvents.SubscriptionEngine.DeadLetterManagement;
+using BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement;
 using Newtonsoft.Json;
 using PageUp.Events;
 

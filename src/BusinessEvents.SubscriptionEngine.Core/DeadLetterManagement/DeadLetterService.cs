@@ -1,12 +1,17 @@
 ﻿using System.Threading.Tasks;
+using PageUp.Telemetry;
 
-namespace BusinessEvents.SubscriptionEngine.DeadLetterManagement
+namespace BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement
 {
     public class DeadLetterService : IDeadLetterService
     {
-        public Task Handle(DeadLetterMessage snsMessage)
+        public Task Handle(DeadLetterMessage deadletter)
         {
-            return null;
+            return Task.Factory.StartNew(() =>
+            {
+                var telemetryService = new TelemetryService();
+                telemetryService.LogTelemetry("0", "business-event", $"business-event-deadletter", deadletter);
+            });
         }
     }
 }
