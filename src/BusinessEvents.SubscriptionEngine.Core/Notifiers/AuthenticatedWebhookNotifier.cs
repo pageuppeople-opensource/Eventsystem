@@ -13,13 +13,12 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
     public class AuthenticatedWebhookNotifier : INotifier
     {
         private readonly IAuthenticationModule authenticationModule;
-        private readonly ISubscriptionsManager subscriptionsManager;
+        private readonly ISubscriberErrorService subscriberErrorService;
 
-        public AuthenticatedWebhookNotifier(IAuthenticationModule authenticationModule,
-            ISubscriptionsManager subscriptionsManager)
+        public AuthenticatedWebhookNotifier(IAuthenticationModule authenticationModule, ISubscriberErrorService subscriberErrorService)
         {
             this.authenticationModule = authenticationModule;
-            this.subscriptionsManager = subscriptionsManager;
+            this.subscriberErrorService = subscriberErrorService;
         }
 
         public async Task Notify(Subscription subscriber, Message message, Event @event)
@@ -59,12 +58,12 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    subscriptionsManager.RecordErrorForSubscriber(subscriber, message, @event, response);
+                    subscriberErrorService.RecordErrorForSubscriber(subscriber, message, @event, response);
                 }
             }
             catch (Exception exception)
             {
-                subscriptionsManager.RecordErrorForSubscriber(subscriber, message, @event, exception);
+                subscriberErrorService.RecordErrorForSubscriber(subscriber, message, @event, exception);
                 throw;
             }
         }

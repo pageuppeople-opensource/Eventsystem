@@ -13,6 +13,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             builder.RegisterType<SubscriptionsManager>().As<ISubscriptionsManager>().SingleInstance();
             builder.RegisterType<AuthenticationModule>().As<IAuthenticationModule>().InstancePerDependency();
             builder.RegisterType<DeadLetterService>().As<IDeadLetterService>().InstancePerDependency();
+            builder.RegisterType<SubscriberErrorService>().As<ISubscriberErrorService>().InstancePerDependency();
 
             builder.RegisterType<TelemetryNotifier>().Keyed<INotifier>(SubscriptionType.Telemetry);
             builder.RegisterType<SlackNotifier>().Keyed<INotifier>(SubscriptionType.Slack);

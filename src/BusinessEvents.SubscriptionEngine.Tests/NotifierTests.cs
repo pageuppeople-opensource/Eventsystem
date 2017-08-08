@@ -8,6 +8,9 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 {
     public class NotifierTests: TestBase
     {
+        private ISubscriberErrorService dummSubscriberErrorService =
+            NSubstitute.Substitute.For<ISubscriberErrorService>();
+
         [Fact]
         public async void PostsToSlack()
         {
@@ -20,7 +23,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 
             var testEvent = Event.CreateEvent("isntanceid", "messagetype", "userid", new { contentbody = "contentbody" }, null, "someorigin");
 
-            var notifier = new SlackNotifier(CreateMock<ISubscriptionsManager>());
+            var notifier = new SlackNotifier(dummSubscriberErrorService);
 
             await notifier.Notify(slackSubscription, testEvent.Messages[0], testEvent);
         }
@@ -37,7 +40,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 
             var testEvent = Event.CreateEvent("isntanceid", "messagetype", "userid", new { contentbody = "contentbody" }, null, "someorigin");
 
-            var notifier = new WebhookNotifier(CreateMock<ISubscriptionsManager>());
+            var notifier = new WebhookNotifier(dummSubscriberErrorService);
 
             await notifier.Notify(slackSubscription, testEvent.Messages[0], testEvent);
         }
@@ -60,7 +63,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 
             var testEvent = Event.CreateEvent("isntanceid", "messagetype", "userid", new { contentbody = "contentbody" }, null, "someorigin");
 
-            var notifier = new AuthenticatedWebhookNotifier(new AuthenticationModule(), CreateMock<SubscriptionsManager>());
+            var notifier = new AuthenticatedWebhookNotifier(new AuthenticationModule(), dummSubscriberErrorService);
 
             await notifier.Notify(slackSubscription, testEvent.Messages[0], testEvent);
         }

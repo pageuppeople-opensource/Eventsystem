@@ -7,11 +7,5 @@ namespace BusinessEvents.SubscriptionEngine.Core
     public interface ISubscriptionsManager
     {
         Subscription[] GetSubscriptionsFor(string businessEvent);
-
-        string RecordErrorForSubscriber(Subscription subscriber, Message eventMessage, Event @event,
-            HttpResponseMessage response);
-
-        string RecordErrorForSubscriber(Subscription subscriber, Message eventMessage, Event @event,
-            Exception exception);
     }
 }

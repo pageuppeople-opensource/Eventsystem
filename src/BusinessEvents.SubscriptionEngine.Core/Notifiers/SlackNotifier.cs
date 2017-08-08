@@ -9,11 +9,11 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 {
     public class SlackNotifier : INotifier
     {
-        private readonly ISubscriptionsManager subscriptionsManager;
+        private readonly ISubscriberErrorService subscriberErrorService;
 
-        public SlackNotifier(ISubscriptionsManager subscriptionsManager)
+        public SlackNotifier(ISubscriberErrorService subscriberErrorService)
         {
-            this.subscriptionsManager = subscriptionsManager;
+            this.subscriberErrorService = subscriberErrorService;
         }
         public async Task Notify(Subscription subscriber, Message message, Event @event)
         {
@@ -32,12 +32,12 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        subscriptionsManager.RecordErrorForSubscriber(subscriber, message, @event, response);
+                        subscriberErrorService.RecordErrorForSubscriber(subscriber, message, @event, response);
                     }
                 }
                 catch (Exception exception)
                 {
-                    subscriptionsManager.RecordErrorForSubscriber(subscriber, message, @event, exception);
+                    subscriberErrorService.RecordErrorForSubscriber(subscriber, message, @event, exception);
                     throw;
                 }
             }
