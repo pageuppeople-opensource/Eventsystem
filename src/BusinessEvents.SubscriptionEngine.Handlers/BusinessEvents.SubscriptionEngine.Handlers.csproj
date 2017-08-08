@@ -32,4 +32,10 @@
     <ProjectReference Include="..\BusinessEvents.SubscriptionEngine.Core\BusinessEvents.SubscriptionEngine.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Configuration\dev.ap-southeast-2.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

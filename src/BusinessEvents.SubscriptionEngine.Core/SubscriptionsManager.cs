@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using PageUp.Events;
 
@@ -7,11 +8,19 @@ namespace BusinessEvents.SubscriptionEngine.Core
 {
     public class SubscriptionsManager : ISubscriptionsManager
     {
+        private static readonly List<Subscription> Subscriptions = S3SubscriptionsManagement.GetSubscriptions().Result;
+        
         public Subscription[] GetSubscriptionsFor(string businessEvent)
         {
-            var subscriptions = new List<Subscription>
+            var validSubscribers = Subscriptions.Where(subscriber => subscriber.BusinessEvent == businessEvent);
+
+            return validSubscribers.Concat(GetDefaultSusbscribers()).ToArray();
+        }
+
+        private List<Subscription> GetDefaultSusbscribers()
+        {
+            return new List<Subscription>
             {
-                // This is a slack weebhook that writes
                 new Subscription()
                 {
                     Type = SubscriptionType.Slack,
@@ -22,28 +31,8 @@ namespace BusinessEvents.SubscriptionEngine.Core
                 {
                     Type = SubscriptionType.Telemetry,
                     BusinessEvent = "*"
-                },
-                new Subscription()
-                {
-                    Type = SubscriptionType.Webhook,
-                    Endpoint = new Uri("https://requestb.in/19swc1r1"),
-                    BusinessEvent = "offer-accepted"
-                },
-                new Subscription()
-                {
-                    Type = SubscriptionType.AuthenticatedWebhook,
-                    Endpoint = new Uri("https://requestb.in/19swc1r1"),
-                    BusinessEvent = "*",
-                    Auth = new Auth
-                    {
-                        Endpoint = new Uri("http://localhost:4050/connect/token"),
-                        ClientId = "testclient",
-                        ClientSecret = "verysecret"
-                    }
                 }
             };
-
-            return subscriptions.ToArray();
         }
 
         public string RecordErrorForSubscriber(Subscription subscriber, Message eventMessage, Event @event,
