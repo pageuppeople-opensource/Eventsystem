@@ -39,7 +39,8 @@ namespace BusinessEvents.SubscriptionEngine.Core
         AuthenticatedWebhook,
         Slack,
         Telemetry,
-        Webhook
+        Webhook,
+        Lambda
     }
 
     public interface ISubscriptionRepository
