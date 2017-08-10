@@ -36,7 +36,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                 {
                     @event = JsonConvert.DeserializeObject<Event>(message);
 
-                    if(@event?.Messages == null || @event.Messages.Length < 1)
+                    if(@event?.Message == null)
                     {
                         await MarkAsDeadLetter(message);
                         continue;

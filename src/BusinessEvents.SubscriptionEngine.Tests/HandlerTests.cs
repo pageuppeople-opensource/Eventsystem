@@ -24,7 +24,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
         public async Task HandlePassesAllSnsRecordsToProcess()
         {
             // arrange
-            var defaultValidEvent = JsonConvert.SerializeObject(new Event() { Messages = new[] { new Message() } });
+            var defaultValidEvent = JsonConvert.SerializeObject(new Event() { Message = new Message() });
 
             var testSnsEvent = new SNSEvent
             {

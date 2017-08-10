@@ -21,7 +21,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="1.1.0" />
-    <PackageReference Include="PageUp.Events" Version="1.0.0" />
+    <PackageReference Include="PageUp.Events" Version="0.0.2" />
   </ItemGroup>
 
   <ItemGroup>

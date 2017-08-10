@@ -21,12 +21,9 @@ namespace BusinessEvents.SubscriptionEngine.Core
             this.notifierFactory = notifierFactory;
         }
         public async Task Process(Event @event)
-        {
-            foreach (var eventMessage in @event.Messages)
-            {
-                var subscribers = subscriptionsManager.GetSubscriptionsFor(eventMessage.Header.MessageType);
-                await NotifySubscribers(subscribers, eventMessage, @event);
-            }
+        {   
+            var subscribers = subscriptionsManager.GetSubscriptionsFor(@event?.Message?.Header?.MessageType);
+            await NotifySubscribers(subscribers, @event?.Message, @event);
         }
 
         private async Task<bool> NotifySubscribers(Subscription[] subscribers, Message eventMessage, Event @event)
