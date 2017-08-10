@@ -52,6 +52,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
         public string BusinessEvent { get; set; }
         public SubscriptionType Type { get; set; }
         public Auth Auth { get; set; }
+        public string LambdaArn { get; set; }
     }
 
     public class Auth

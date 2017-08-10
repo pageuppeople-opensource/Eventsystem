@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Amazon.Lambda;
 using Amazon.Lambda.Model;
+using Newtonsoft.Json;
 using PageUp.Events;
 
 namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
@@ -15,18 +17,22 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
             this.subscriberErrorService = subscriberErrorService;
         }
 
-        public Task Notify(Subscription subscriber, Message message, Event @event)
+        public async Task Notify(Subscription subscriber, Message message, Event @event)
         {
-//            using (var client = new AmazonLambdaClient())
-//            {
-//                var request = new InvokeAsyncRequest
-//                {
-//                    FunctionName = subscriber.LambdaName,
-//                    InvokeArgs = @event.Header
-//                }
-//            }
+            using (var client = new AmazonLambdaClient())
+            {
+                var request = new InvokeRequest
+                {
+                    FunctionName = subscriber.LambdaArn,
+                    Payload = JsonConvert.SerializeObject(@event)
+                };
 
-            throw new NotImplementedException();
+                var response  = await client.InvokeAsync(request);
+
+                if (response.StatusCode > 299)
+                    subscriberErrorService.RecordErrorForSubscriber(subscriber, @event.Message, @event, response);
+            }
+
         }
     }
 }
