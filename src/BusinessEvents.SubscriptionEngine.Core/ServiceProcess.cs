@@ -32,7 +32,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             {
                 var notifier = notifierFactory[subscriber.Type];
 
-                var task = Task.Run(async () => { await notifier.Notify(subscriber, eventMessage, @event); });
+                var task = Task.Run(async () => { await notifier.Notify(subscriber, @event); });
                 task.Wait();
             }));
 

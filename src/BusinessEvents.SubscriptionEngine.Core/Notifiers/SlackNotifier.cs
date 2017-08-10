@@ -15,11 +15,11 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
         {
             this.subscriberErrorService = subscriberErrorService;
         }
-        public async Task Notify(Subscription subscriber, Message message, Event @event)
+        public async Task Notify(Subscription subscriber, Event @event)
         {
             var slackText = new
             {
-                text = JsonConvert.SerializeObject(message)
+                text = JsonConvert.SerializeObject(new { @event.Header, MessageHeader = @event.Message.Header })
             };
 
             var payloadJson = JsonConvert.SerializeObject(slackText);
@@ -32,12 +32,12 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        subscriberErrorService.RecordErrorForSubscriber(subscriber, message, @event, response);
+                        subscriberErrorService.RecordErrorForSubscriber(subscriber, @event, response);
                     }
                 }
                 catch (Exception exception)
                 {
-                    subscriberErrorService.RecordErrorForSubscriber(subscriber, message, @event, exception);
+                    subscriberErrorService.RecordErrorForSubscriber(subscriber, @event, exception);
                     throw;
                 }
             }

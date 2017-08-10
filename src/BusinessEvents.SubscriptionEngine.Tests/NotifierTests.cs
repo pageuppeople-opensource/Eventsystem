@@ -25,7 +25,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 
             var notifier = new SlackNotifier(dummSubscriberErrorService);
 
-            await notifier.Notify(slackSubscription, testEvent.Message, testEvent);
+            await notifier.Notify(slackSubscription, testEvent);
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 
             var notifier = new WebhookNotifier(dummSubscriberErrorService);
 
-            await notifier.Notify(slackSubscription, testEvent.Message, testEvent);
+            await notifier.Notify(slackSubscription, testEvent);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 
             var notifier = new AuthenticatedWebhookNotifier(new AuthenticationModule(), dummSubscriberErrorService);
 
-            await notifier.Notify(slackSubscription, testEvent.Message, testEvent);
+            await notifier.Notify(slackSubscription, testEvent);
         }
     }
 }

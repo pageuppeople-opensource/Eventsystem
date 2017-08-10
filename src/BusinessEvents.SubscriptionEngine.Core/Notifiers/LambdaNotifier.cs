@@ -17,7 +17,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
             this.subscriberErrorService = subscriberErrorService;
         }
 
-        public async Task Notify(Subscription subscriber, Message message, Event @event)
+        public async Task Notify(Subscription subscriber, Event @event)
         {
             using (var client = new AmazonLambdaClient())
             {
@@ -30,7 +30,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
                 var response  = await client.InvokeAsync(request);
 
                 if (response.StatusCode > 299)
-                    subscriberErrorService.RecordErrorForSubscriber(subscriber, @event.Message, @event, response);
+                    subscriberErrorService.RecordErrorForSubscriber(subscriber, @event, response);
             }
 
         }

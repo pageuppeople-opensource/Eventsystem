@@ -8,10 +8,9 @@ namespace BusinessEvents.SubscriptionEngine.Core
 {
     public class SubscriberErrorService: ISubscriberErrorService
     {
-        public string RecordErrorForSubscriber(Subscription subscriber, Message eventMessage, Event @event,
-            HttpResponseMessage response)
+        public string RecordErrorForSubscriber(Subscription subscriber, Event @event, HttpResponseMessage response)
         {
-            var errorMessage = ConstructErrorMessage(subscriber, eventMessage,
+            var errorMessage = ConstructErrorMessage(subscriber, @event.Message,
                 $"{response.StatusCode + " " + response.ReasonPhrase + " " + response.Content.ReadAsStringAsync().Result }");
 
             Console.WriteLine(errorMessage);
@@ -20,7 +19,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             telemetryService.LogTelemetry("0", "business-event", $"business-event-subscription-error", new
             {
                 Subscriber = subscriber,
-                MessageHeader = eventMessage.Header,
+                MessageHeader = @event.Message.Header,
                 EventHeader = @event.Header,
                 Response = response,
                 Message = errorMessage
@@ -29,9 +28,9 @@ namespace BusinessEvents.SubscriptionEngine.Core
             return errorMessage;
         }
 
-        public string RecordErrorForSubscriber(Subscription subscriber, Message eventMessage, Event @event, InvokeResponse response)
+        public string RecordErrorForSubscriber(Subscription subscriber, Event @event, InvokeResponse response)
         {
-            var errorMessage = ConstructErrorMessage(subscriber, eventMessage,
+            var errorMessage = ConstructErrorMessage(subscriber, @event.Message,
                 $"{response.StatusCode + " " + response.FunctionError + " " + response.Payload }");
 
             Console.WriteLine(errorMessage);
@@ -40,7 +39,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             telemetryService.LogTelemetry("0", "business-event", $"business-event-subscription-error", new
             {
                 Subscriber = subscriber,
-                MessageHeader = eventMessage.Header,
+                MessageHeader = @event.Message.Header,
                 EventHeader = @event.Header,
                 Response = response,
                 Message = errorMessage
@@ -49,9 +48,9 @@ namespace BusinessEvents.SubscriptionEngine.Core
             return errorMessage;
         }
 
-        public string RecordErrorForSubscriber(Subscription subscriber, Message eventMessage, Event @event, Exception exception)
+        public string RecordErrorForSubscriber(Subscription subscriber, Event @event, Exception exception)
         {
-            var errorMessage = ConstructErrorMessage(subscriber, eventMessage,
+            var errorMessage = ConstructErrorMessage(subscriber, @event.Message,
                 exception.InnerException?.Message ?? exception.Message);
 
             Console.WriteLine(errorMessage);
@@ -59,7 +58,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             var telemetryService = new TelemetryService();
             telemetryService.LogTelemetry("0", "business-event", $"business-event-subscription-error", new {
                 Subscriber = subscriber,
-                MessageHeader = eventMessage.Header,
+                MessageHeader = @event.Message.Header,
                 EventHeader = @event.Header,
                 Exception = exception,
                 Message = errorMessage

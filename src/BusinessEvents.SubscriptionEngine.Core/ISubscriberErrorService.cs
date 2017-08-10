@@ -7,8 +7,8 @@ namespace BusinessEvents.SubscriptionEngine.Core
 {
     public interface ISubscriberErrorService
     {
-        string RecordErrorForSubscriber(Subscription subscriber, Message eventMessage, Event @event, Exception exception);
-        string RecordErrorForSubscriber(Subscription subscriber, Message eventMessage, Event @event, HttpResponseMessage response);
-        string RecordErrorForSubscriber(Subscription subscriber, Message message, Event @event, InvokeResponse response);
+        string RecordErrorForSubscriber(Subscription subscriber, Event @event, Exception exception);
+        string RecordErrorForSubscriber(Subscription subscriber, Event @event, HttpResponseMessage response);
+        string RecordErrorForSubscriber(Subscription subscriber, Event @event, InvokeResponse response);
     }
 }
