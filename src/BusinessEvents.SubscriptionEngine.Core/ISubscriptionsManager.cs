@@ -1,11 +1,9 @@
-﻿using System;
-using System.Net.Http;
-using PageUp.Events;
+﻿using System.Threading.Tasks;
 
 namespace BusinessEvents.SubscriptionEngine.Core
 {
     public interface ISubscriptionsManager
     {
-        Subscription[] GetSubscriptionsFor(string businessEvent);
+        Task<Subscription[]> GetSubscriptionsFor(string businessEvent);
     }
 }

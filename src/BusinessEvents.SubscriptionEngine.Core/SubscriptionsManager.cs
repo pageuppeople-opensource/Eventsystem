@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BusinessEvents.SubscriptionEngine.Core
 {
     public class SubscriptionsManager : ISubscriptionsManager
-    {
-        private static readonly List<Subscription> Subscriptions = S3SubscriptionsManagement.GetSubscriptions().Result;
-        
-        public Subscription[] GetSubscriptionsFor(string businessEvent)
+    {   
+        public async Task<Subscription[]> GetSubscriptionsFor(string businessEvent)
         {
+            var Subscriptions = await S3SubscriptionsManagement.GetSubscriptions();
+
             var validSubscribers = Subscriptions.Where(subscriber => subscriber.BusinessEvent == businessEvent);
 
             return validSubscribers.Concat(GetDefaultSusbscribers()).ToArray();

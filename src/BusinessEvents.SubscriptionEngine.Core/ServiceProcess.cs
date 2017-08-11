@@ -22,11 +22,11 @@ namespace BusinessEvents.SubscriptionEngine.Core
         }
         public async Task Process(Event @event)
         {   
-            var subscribers = subscriptionsManager.GetSubscriptionsFor(@event?.Message?.Header?.MessageType);
-            await NotifySubscribers(subscribers, @event?.Message, @event);
+            var subscribers = await subscriptionsManager.GetSubscriptionsFor(@event?.Message?.Header?.MessageType);
+            await NotifySubscribers(subscribers, @event);
         }
 
-        private async Task<bool> NotifySubscribers(Subscription[] subscribers, Message eventMessage, Event @event)
+        private async Task<bool> NotifySubscribers(Subscription[] subscribers, Event @event)
         {   
             var result = await Task.Factory.StartNew(() => Parallel.ForEach(subscribers, subscriber =>
             {

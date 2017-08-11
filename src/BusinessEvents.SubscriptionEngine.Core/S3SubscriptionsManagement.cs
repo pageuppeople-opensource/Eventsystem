@@ -12,42 +12,75 @@ namespace BusinessEvents.SubscriptionEngine.Core
 {
     public class S3SubscriptionsManagement
     {
-        private static AmazonS3Client client;
         private static readonly string BucketName = $"subscription-management-{Environment.GetEnvironmentVariable("AWS_REGION")?.ToLower() ?? "ap-southeast-2"}";
-        private static readonly string FileName = "subscriptions.json";
+
+        private const string FileName = "subscriptions.json";
+
+        private static List<Subscription> subscriptions;
+        private static DateTime lastModified = DateTime.MinValue;
 
         public static async Task<List<Subscription>> GetSubscriptions(AWSCredentials awsCredentials = null)
         {
-            var request = new GetObjectRequest
-            {
-                BucketName = BucketName,
-                Key = FileName
-            };
-         
             string content = "";
 
-            using (client = CreateClient(awsCredentials))
+            using (var client = CreateClient(awsCredentials))
             {
                 try
                 {
-                    using (var response = await client.GetObjectAsync(request))
-                    using (var stream = response.ResponseStream)
-                    using (var reader = new StreamReader(stream))
+                    if (await GetLastModified(client) > lastModified)
                     {
-                        content = reader.ReadToEnd();
+                        content = await GetContent(client);
                     }
                 }
                 catch (AmazonS3Exception exception)
                 {
                     if (exception.StatusCode != System.Net.HttpStatusCode.NotFound) throw;
 
-                    if (exception.ErrorCode == "NoSuchKey")
-                        await CreateS3Item(client);
-                    else await CreateS3BucketAndItem(client);
-                }
-            }   
+                    if (exception.ErrorCode == "NoSuchKey") await CreateS3Item(client);
 
-            return JsonConvert.DeserializeObject<List<Subscription>>(content);
+                    else await CreateS3BucketAndItem(client);
+
+                    content = await GetContent(client);
+                }
+            }
+
+            subscriptions = JsonConvert.DeserializeObject<List<Subscription>>(content);
+
+            return subscriptions;
+        }
+
+        private static async Task<string> GetContent(AmazonS3Client client)
+        {
+            string content;
+
+            using (var response = await client.GetObjectAsync(new GetObjectRequest
+            {
+                BucketName = BucketName,
+                Key = FileName
+            }))
+            using (var stream = response.ResponseStream)
+            using (var reader = new StreamReader(stream))
+            {
+                content = reader.ReadToEnd();
+                lastModified = response.LastModified;
+            }
+
+            return content;
+        }
+
+        private static async Task<DateTime> GetLastModified(AmazonS3Client client)
+        {
+            var request = new GetObjectMetadataRequest
+            {
+                BucketName = BucketName,
+                Key = FileName
+            };
+
+            var response = await client.GetObjectMetadataAsync(request);
+
+            lastModified = response.LastModified;
+
+            return lastModified;
         }
 
         private static async Task CreateS3BucketAndItem(AmazonS3Client client)
@@ -77,7 +110,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
 
         private static AmazonS3Client CreateClient(AWSCredentials awsCredentials)
         {
-            var s3config = new AmazonS3Config()
+            var s3config = new AmazonS3Config
             {
                 RegionEndpoint = RegionEndpoint.APSoutheast2
             };
