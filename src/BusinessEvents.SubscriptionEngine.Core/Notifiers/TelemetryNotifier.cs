@@ -11,7 +11,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
             return Task.Factory.StartNew(() =>
             {
                 var telemetryService = new TelemetryService();
-                telemetryService.LogTelemetry(@event.Header.InstanceId, "business-event", $"business-event-{@event.Message.Header.MessageType}" ,
+                telemetryService.LogTelemetry(@event.Header.InstanceId, "business-event", @event.Message.Header.MessageType ,
                 new { MessageHeader = @event.Message.Header, EventHeader = @event.Header });
             });
         }

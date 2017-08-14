@@ -6,6 +6,7 @@ using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Castle.Core.Logging;
 using Newtonsoft.Json;
 
 namespace BusinessEvents.SubscriptionEngine.Core
@@ -21,19 +22,25 @@ namespace BusinessEvents.SubscriptionEngine.Core
 
         public static async Task<List<Subscription>> GetSubscriptions(AWSCredentials awsCredentials = null)
         {
-            string content = "";
+            string content = "[]";
 
             using (var client = CreateClient(awsCredentials))
             {
                 try
                 {
-                    if (await GetLastModified(client) > lastModified)
+                    Console.WriteLine($"S3Subscription: Last modified date {lastModified}");
+
+                    var modifiedAt = await GetLastModified(client);
+
+                    Console.WriteLine($"S3Subscription: S3 modified at {modifiedAt}");
+
+                    if (modifiedAt > lastModified)
                     {
                         content = await GetContent(client);
                     }
                 }
                 catch (AmazonS3Exception exception)
-                {
+                {   
                     if (exception.StatusCode != System.Net.HttpStatusCode.NotFound) throw;
 
                     if (exception.ErrorCode == "NoSuchKey") await CreateS3Item(client);
@@ -43,6 +50,8 @@ namespace BusinessEvents.SubscriptionEngine.Core
                     content = await GetContent(client);
                 }
             }
+
+            Console.WriteLine($"Subscription file contents are {content}");
 
             subscriptions = JsonConvert.DeserializeObject<List<Subscription>>(content);
 
@@ -110,11 +119,11 @@ namespace BusinessEvents.SubscriptionEngine.Core
 
         private static AmazonS3Client CreateClient(AWSCredentials awsCredentials)
         {
-            var s3config = new AmazonS3Config
+            var s3Config = new AmazonS3Config
             {
                 RegionEndpoint = RegionEndpoint.APSoutheast2
             };
-            return awsCredentials == null ? new AmazonS3Client(s3config) : new AmazonS3Client(awsCredentials, s3config);
+            return awsCredentials == null ? new AmazonS3Client(s3Config) : new AmazonS3Client(awsCredentials, s3Config);
         }
     }
 }

@@ -13,9 +13,9 @@ namespace BusinessEvents.SubscriptionEngine.Core
     public class ServiceProcess : IServiceProcess
     {
         private readonly ISubscriptionsManager subscriptionsManager;
-        private readonly IIndex<SubscriptionType, INotifier> notifierFactory;
+        private readonly IIndex<string, INotifier> notifierFactory;
 
-        public ServiceProcess(ISubscriptionsManager subscriptionsManager, IIndex<SubscriptionType, INotifier> notifierFactory)
+        public ServiceProcess(ISubscriptionsManager subscriptionsManager, IIndex<string, INotifier> notifierFactory)
         {
             this.subscriptionsManager = subscriptionsManager;
             this.notifierFactory = notifierFactory;

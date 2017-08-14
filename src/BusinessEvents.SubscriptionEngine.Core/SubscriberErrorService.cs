@@ -16,7 +16,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             Console.WriteLine(errorMessage);
 
             var telemetryService = new TelemetryService();
-            telemetryService.LogTelemetry("0", "business-event", $"business-event-subscription-error", new
+            telemetryService.LogTelemetry("0", "business-event", "subscription-error", new
             {
                 Subscriber = subscriber,
                 MessageHeader = @event.Message.Header,
@@ -36,7 +36,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             Console.WriteLine(errorMessage);
 
             var telemetryService = new TelemetryService();
-            telemetryService.LogTelemetry("0", "business-event", $"business-event-subscription-error", new
+            telemetryService.LogTelemetry("0", "business-event", "subscription-error", new
             {
                 Subscriber = subscriber,
                 MessageHeader = @event.Message.Header,
@@ -56,7 +56,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             Console.WriteLine(errorMessage);
 
             var telemetryService = new TelemetryService();
-            telemetryService.LogTelemetry("0", "business-event", $"business-event-subscription-error", new {
+            telemetryService.LogTelemetry("0", "business-event", "subscription-error", new {
                 Subscriber = subscriber,
                 MessageHeader = @event.Message.Header,
                 EventHeader = @event.Header,

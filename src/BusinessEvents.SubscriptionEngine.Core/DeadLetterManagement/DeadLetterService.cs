@@ -10,7 +10,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement
             return Task.Factory.StartNew(() =>
             {
                 var telemetryService = new TelemetryService();
-                telemetryService.LogTelemetry("0", "business-event", $"business-event-deadletter", deadletter);
+                telemetryService.LogTelemetry("0", "business-event", "deadletter", deadletter);
             });
         }
     }

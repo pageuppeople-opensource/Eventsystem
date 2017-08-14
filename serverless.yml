@@ -1,5 +1,6 @@
-service: BusinessEvents-SubscriptionEngine 
-
+service: 
+  name: BusinessEvents-SubscriptionEngine 
+  awsKmsKeyArn: arn:aws:kms:ap-southeast-2::key/subscription-system
 provider:
   name: aws
   runtime: dotnetcore1.0
@@ -27,8 +28,13 @@ package:
 functions:
   handle:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::Handle
+    awsKmsKeyArn: arn:aws:kms:ap-southeast-2::key/subscription-system
     events:
       - sns: BusinessEvents
+    environment:
+      AUTH_CLIENT_ID: clientId
+      AUTH_ENDPOINT: endpoint
+      AUTH_CLIENT_SECRET: somesecret
   healthcheck:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::HealthCheck
     events:
