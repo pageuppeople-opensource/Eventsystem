@@ -25,7 +25,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
         {
             var cancellationToken = new CancellationToken();
 
-            var token = await authenticationModule.GetToken(subscriber, cancellationToken);
+            var token = await authenticationModule.GetToken(subscriber, @event.Header.InstanceId,  cancellationToken);
 
             try
             {
@@ -52,7 +52,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 
                 if (response.StatusCode == HttpStatusCode.Unauthorized)
                 {
-                    token = await authenticationModule.RenewToken(subscriber, cancellationToken);
+                    token = await authenticationModule.RenewToken(subscriber, @event.Header.InstanceId, cancellationToken);
                     response = await PostFunc(token);
                 }
 

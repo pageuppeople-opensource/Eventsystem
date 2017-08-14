@@ -24,7 +24,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
                 }
             };
 
-            var token = await module.GetToken(subscription, CancellationToken.None);
+            var token = await module.GetToken(subscription, "0", CancellationToken.None);
 
             Assert.False(token.token.IsNullOrEmpty());
             Assert.Equal("Bearer", token.scheme);

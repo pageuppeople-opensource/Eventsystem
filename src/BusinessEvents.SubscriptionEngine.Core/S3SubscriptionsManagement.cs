@@ -22,8 +22,6 @@ namespace BusinessEvents.SubscriptionEngine.Core
 
         public static async Task<List<Subscription>> GetSubscriptions(AWSCredentials awsCredentials = null)
         {
-            string content = "[]";
-
             using (var client = CreateClient(awsCredentials))
             {
                 try
@@ -36,24 +34,34 @@ namespace BusinessEvents.SubscriptionEngine.Core
 
                     if (modifiedAt > lastModified)
                     {
-                        content = await GetContent(client);
+                        var content = await GetContent(client);
+                        subscriptions = JsonConvert.DeserializeObject<List<Subscription>>(content);
+
+                        lastModified = modifiedAt;
+                        Console.WriteLine($"S3Subscription: S3 content at first read {content}");
                     }
                 }
                 catch (AmazonS3Exception exception)
-                {   
+                {
                     if (exception.StatusCode != System.Net.HttpStatusCode.NotFound) throw;
 
                     if (exception.ErrorCode == "NoSuchKey") await CreateS3Item(client);
 
                     else await CreateS3BucketAndItem(client);
 
-                    content = await GetContent(client);
+                    var content = await GetContent(client);
+                    subscriptions = JsonConvert.DeserializeObject<List<Subscription>>(content);
+
+                    Console.WriteLine($"S3Subscription: S3 content after reading the bucket /item is {content}");
+
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine($"S3Subscription: Error received when ready s3 for subscriptions: {exception}");
                 }
             }
 
-            Console.WriteLine($"Subscription file contents are {content}");
-
-            subscriptions = JsonConvert.DeserializeObject<List<Subscription>>(content);
+            Console.WriteLine($"S3Subscriptions: returning subsciptions {JsonConvert.SerializeObject(subscriptions)}");
 
             return subscriptions;
         }
@@ -87,9 +95,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
 
             var response = await client.GetObjectMetadataAsync(request);
 
-            lastModified = response.LastModified;
-
-            return lastModified;
+            return response.LastModified;
         }
 
         private static async Task CreateS3BucketAndItem(AmazonS3Client client)

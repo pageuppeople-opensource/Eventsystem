@@ -9,22 +9,22 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 {
     public interface IAuthenticationModule
     {
-        Task<(string scheme, string token)> GetToken(Subscription subscription, CancellationToken cancellationToken);
-        Task<(string scheme, string token)> RenewToken(Subscription subscription, CancellationToken cancellationToken);
+        Task<(string scheme, string token)> GetToken(Subscription subscription, string instanceId, CancellationToken cancellationToken);
+        Task<(string scheme, string token)> RenewToken(Subscription subscription, string instanceId, CancellationToken cancellationToken);
     }
 
     public class AuthenticationModule : IAuthenticationModule
     {
         private (string scheme, string token) authContent;
 
-        public async Task<(string scheme, string token)> GetToken(Subscription subscription, CancellationToken cancellationToken)
+        public async Task<(string scheme, string token)> GetToken(Subscription subscription, string instanceId, CancellationToken cancellationToken)
         {
             if (authContent.token != null) return authContent;
 
-            return await RenewToken(subscription, cancellationToken);
+            return await RenewToken(subscription, instanceId, cancellationToken);
         }
 
-        public async Task<(string scheme, string token)> RenewToken(Subscription subscription, CancellationToken cancellationToken)
+        public async Task<(string scheme, string token)> RenewToken(Subscription subscription, string instanceId, CancellationToken cancellationToken)
         {
             var auth = subscription.Auth ?? new Auth
             {
@@ -39,8 +39,8 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
                     { "client_id", auth.ClientId },
                     { "client_secret", auth.ClientSecret },
                     { "grant_type", "client_credentials" },
-                    { "scope", "Subscription.Notify" },
-                    { "instanceId", "0" } //TODO: need to remove this once identitylocal is not forcing me with this.
+                    { "scope", "Compliance.Write" }, // TODO: make this a generic one.
+                    { "instanceId", $"{instanceId}" }
                 })
             };
 
@@ -50,6 +50,8 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
                 response.EnsureSuccessStatusCode();
 
                 var payload = JObject.Parse(await response.Content.ReadAsStringAsync());
+
+                Console.WriteLine($"AuthModule: Authentication token is successful, does it have value, {payload.HasValues}");
 
                 authContent = (scheme: payload.Value<string>("token_type"), token: payload.Value<string>("access_token"));
             }
