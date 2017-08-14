@@ -60,6 +60,11 @@ Currently authenticated webhook notifier does not work in DC0. Auth server and c
 {"Header":{"UserId":"userId","TransportTimeStamp":"2017-07-21T00:28:54.2282942Z","Metadata":{"metaheader1":"metaheadervalue1"},"Origin":"origin","InstanceId":"instanceId","CorrelationId":"d3e35fe4-ad84-46c0-b54f-3a6dc779630d"},"Message":{"Header":{"Metadata":null,"MessageType":"messagetype","MessageId":"a9757a12-a80e-4e32-9bab-e3d65a4b3a92"},"Body":{"contents":"bodycontents"}}}
 ```
 
+#### Data to test authenticated webhook in compliance
+```
+{"Header":{"UserId":"userId","TransportTimeStamp":"2017-07-21T00:28:54.2282942Z","Metadata":{"metaheader1":"metaheadervalue1"},"Origin":"origin","InstanceId":"218","CorrelationId":"d3e35fe4-ad84-46c0-b54f-3a6dc779630d"},"Message":{"Header":{"Metadata":null,"MessageType":"offer-accepted","MessageId":"a9757a12-a80e-4e32-9bab-e3d65a4b3a92"},"Body":{"contents":"bodycontents"}}}
+```
+
 ## Deploy
 ```
 serverless deploy
