@@ -39,7 +39,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
                     { "client_id", auth.ClientId },
                     { "client_secret", auth.ClientSecret },
                     { "grant_type", "client_credentials" },
-                    { "scope", "Compliance.Write" }, // TODO: make this a generic one.
+                    { "scope", "Private.SubscriptionEngine.Notify" },
                     { "instanceId", $"{instanceId}" }
                 })
             };
