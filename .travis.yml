@@ -2,16 +2,17 @@ language: csharp
 dist: trusty
 mono: none
 dotnet: 1.0.4
-
 before_script:
 - npm install -g serverless@1.9.0
-
 script:
 - "./build.sh --quiet verify"
-
 deploy:
 - provider: script
   skip_cleanup: true
   script: "./deploy.sh"
   on:
     branch: master
+env:
+  global:
+  - secure: p2D2kZGTCag2vCAGVAVFK7RBy5BYKWsw5SvJaQVvXmx7HYfGrHXBv6eA0QMPhCZCJ3iipZlX5KFm6v4y/IjyjaP8eYkTruEappjOewXfm7bOZXi4jvKKk3XAoncVWu2pZtdFw9n58VmFgaGwv+zBo6GLSPhS0nFKsxUYVz4thtp3K6ZNRPB1VYz88uVizOEroINgWn2cIIBfpKpqs4W7vc9mfVEVBfIfbpgUppQrtD3ChqiWu3Dlcaz7dgC+pSiFJZYFG1T+PFzIHJwR9K46u0vWi7BZmP/HnskkKSP5qiwzG+iTSanyGIMguvfYdDYGjOpCZ7wO3NJIkTMxUquHOX83A4z703cNp49YXxW5J+8ij1ga3CLRZwkfvTjnCWzYLRQKXxUijlHNbnMZAkgCqHQ9Ut4xs1kP1Sdis4dEEqUY1lw/oYKIBBxOnx9esIP/twy3gmAt/ybwv4DFu6HzKaaiPknrG3llUln/SRq6K7x725nRAeq/mMgbJNf7XWJocRrjyYE8w5ZHUGpKUlyakGHzBSFCA+PqpuEiNhgpM+YUZilZ6r3BpJI4CzjnAxzP0DKL3oPW5HrQdwdz8mxT1m0HXgTrhcvJR+ZtIlfmu8/WVa63kzfamQC8W0rGrJ6ugrOyEUkEUpIdd00Jp809+ORW/CPc8zaloSCnYDT9OsM=
+  - secure: h3dSE+p2o760sSqZk9m4IfLQBrZMf+zj3eqdqgqi5JGVq1FxASUZyMLfbFjWgfdDzOd+bYYhctzw0qMCZ72RKOny/NVOi1pToy2BFa7bwWaBmiO6bxMSbMGt9kDq02KL9Mo2m3sKtyUCxVWbxKn5MbCgJ7SYFM7q3XAhE3yLXK69YzVTuXf6M06j4fZVFmJaaReeTonYfsmhMS8SHxRpFz/6I1zhIwRCU7V3UDmp2vHf2VQOPH8hgEzT4KWypzDhSx+5h20BXeIfQvNPdOpEhh0LScfPI+a4DSrDfzdOFQk68iwAssLXtmgqbpH+dryX2X+4AzvTnvM4tUkM2dpd01Ij9rIUkc/DhgDqg7CWMWngHsx9cki13MTR1htk8vw4dH1gBZHtyHsCF7NvFnEqH4qvW8CsdEMMC1/zD81VXTdM1bpmh1s8TKFE/H8inbfpJHKtcdNhRH5k04dHi/Hk7SR425RpPDsC/g8Z575EKwIJBLz27GHiFy3uNMysy2fZVSQF0XyG+R/0zoyYymx19mNKJOMK9C2nYEVbjKedyr6eLUhGTireLwRcz6HjUwhZoIByZToARflx3NW+nfoA+SyEF/hF8hk7N/xlGf8SAqNtRc/VlSYpLyO7uBSzdxXnDjwesk9UkHOaBZdXp0mXi0l1LVXKQaGwDFO6pB/w/ZM=
