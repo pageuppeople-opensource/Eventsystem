@@ -7,24 +7,16 @@
     <RootNamespace>BusinessEvents.SubscriptionEngine.Core</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0" />
+  <ItemGroup>    
     <PackageReference Include="Autofac" Version="4.6.1" />
     <PackageReference Include="AWSSDK.S3" Version="3.3.4" />
+    <PackageReference Include="AWSSDK.Lambda" Version="3.3.8" />
+    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
-    <PackageReference Include="PageUp.Events" Version="0.0.2" />
+    <PackageReference Include="PageUp.Events" Version="0.0.4" />
     <PackageReference Include="PageUp.Telemetry" Version="1.2.6" />
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="AWSSDK.Lambda">
-      <HintPath>..\..\..\..\.nuget\packages\awssdk.lambda\3.3.2.9\lib\netstandard1.3\AWSSDK.Lambda.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Tasks.Parallel">
-      <HintPath>..\..\..\..\.nuget\packages\system.threading.tasks.parallel\4.0.1\ref\netstandard1.1\System.Threading.Tasks.Parallel.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
