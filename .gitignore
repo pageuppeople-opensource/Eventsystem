@@ -244,5 +244,4 @@ _Pvt_Extensions
 
 # Serverless directories
 .serverless
-
-
+serverless-environment-variables.yml

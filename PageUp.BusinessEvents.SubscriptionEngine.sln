@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		docker-compose.yml = docker-compose.yml
 		README.md = README.md
 		serverless.yml = serverless.yml
+		serverless-environment-variables.yml.enc = serverless-environment-variables.yml.enc
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine.Core", "src\BusinessEvents.SubscriptionEngine.Core\BusinessEvents.SubscriptionEngine.Core.csproj", "{6D3F01AC-C0BD-42E6-B1F2-9A06278AD714}"
