@@ -13,9 +13,9 @@ namespace BusinessEvents.SubscriptionEngine.Core
 {
     public class S3SubscriptionsManagement
     {
-        private static readonly string BucketName = $"subscription-management-{Environment.GetEnvironmentVariable("AWS_REGION")?.ToLower() ?? "ap-southeast-2"}";
+        private static readonly string BucketName = $"pageup-integration-{Environment.GetEnvironmentVariable("DATA_CENTER")?.ToLower() ?? "dc0"}";
 
-        private const string FileName = "subscriptions.json";
+        private const string FileName = "subscription-management/subscriptions.json";
 
         private static List<Subscription> subscriptions;
         private static DateTime lastModified = DateTime.MinValue;
@@ -105,9 +105,9 @@ namespace BusinessEvents.SubscriptionEngine.Core
                 BucketName = BucketName,
                 BucketRegion = S3Region.APS2
             };
-           
+
             await client.PutBucketAsync(createBucketRequest);
-            await CreateS3Item(client);   
+            await CreateS3Item(client);
         }
 
         private static async Task CreateS3Item(AmazonS3Client client)
@@ -119,7 +119,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
                 ContentType = "application/json",
                 ContentBody = "[]"
             };
-           
+
             await client.PutObjectAsync(createItemRequest);
         }
 

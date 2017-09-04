@@ -3,7 +3,7 @@ service:
   awsKmsKeyArn: arn:aws:kms:ap-southeast-2::key/subscription-system
 provider:
   name: aws
-  runtime: dotnetcore1.1
+  runtime: dotnetcore1.0
   stage: v1
   region: ap-southeast-2
   deploymentBucket: serverless.${self:provider.region}.deploys
@@ -23,7 +23,7 @@ provider:
         - "s3:PutBucket"
 
 package:
-  artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.1/publish/deploy-package.zip
+  artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.0/publish/deploy-package.zip
 
 functions:
   handle:
@@ -41,4 +41,4 @@ functions:
       - http:
           path: healthcheck
           method: get
-          cors: true  
+          cors: true
