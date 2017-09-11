@@ -1,20 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <AssemblyTitle>BusinessEvents.SubscriptionEngine.Core</AssemblyTitle>
     <TargetFramework>netstandard1.6</TargetFramework>
     <AssemblyName>BusinessEvents.SubscriptionEngine.Core</AssemblyName>
     <RootNamespace>BusinessEvents.SubscriptionEngine.Core</RootNamespace>
   </PropertyGroup>
-
-  <ItemGroup>    
+  <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.1" />
     <PackageReference Include="AWSSDK.S3" Version="3.3.4" />
     <PackageReference Include="AWSSDK.Lambda" Version="3.3.8" />
+    <PackageReference Include="PageUp.Events" Version="0.0.5" />
     <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
-    <PackageReference Include="PageUp.Events" Version="0.0.4" />
     <PackageReference Include="PageUp.Telemetry" Version="1.2.6" />
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
