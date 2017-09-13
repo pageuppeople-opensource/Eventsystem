@@ -22,6 +22,8 @@ namespace BusinessEvents.SubscriptionEngine.Core
 
         public static async Task<List<Subscription>> GetSubscriptions(AWSCredentials awsCredentials = null)
         {
+            Console.WriteLine($"BucketName: {BucketName}");
+
             using (var client = CreateClient(awsCredentials))
             {
                 try
@@ -127,9 +129,36 @@ namespace BusinessEvents.SubscriptionEngine.Core
         {
             var s3Config = new AmazonS3Config
             {
-                RegionEndpoint = RegionEndpoint.APSoutheast2
+                RegionEndpoint = GetRegionEndpoint()
             };
             return awsCredentials == null ? new AmazonS3Client(s3Config) : new AmazonS3Client(awsCredentials, s3Config);
+        }
+
+        private static RegionEndpoint GetRegionEndpoint()
+        {
+            switch(Environment.GetEnvironmentVariable("DATA_CENTER"))
+            {
+                case "dc0":
+                case "dc2":
+                {
+                    return RegionEndpoint.APSoutheast2;
+                }
+                case "dc3":
+                case "dc7":
+                {
+                    return RegionEndpoint.EUWest1;
+                }
+                case "dc4":
+                {
+                    return RegionEndpoint.USEast1;
+                }
+                case "dc5":
+                case "dc6":
+                {
+                    return RegionEndpoint.APSoutheast1;
+                }
+                default: return RegionEndpoint.APSoutheast2;
+            }
         }
     }
 }
