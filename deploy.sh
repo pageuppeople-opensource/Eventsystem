@@ -2,6 +2,7 @@
 
 echo "####### Build version: $BUILD_VERSION"
 echo "####### Travis build version: $TRAVIS_BUILD_NUMBER"
+export SLS_DEBUG=true
 
 if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
     echo "####### Not deploying on pull request"
