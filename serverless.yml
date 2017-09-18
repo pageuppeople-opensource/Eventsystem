@@ -22,6 +22,10 @@ provider:
         - "s3:GetObject"
         - "s3:CreateBucket"
         - "s3:PutBucket"
+    - Effect: "Allow"
+      Resource: "arn:aws:lambda:*:*:function:integration*"
+      Action:
+        - "lambda:*"
 
 package:
   artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.0/publish/deploy-package.zip
