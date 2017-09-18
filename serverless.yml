@@ -25,7 +25,27 @@ provider:
     - Effect: "Allow"
       Resource: "arn:aws:lambda:*:*:function:integration*"
       Action:
-        - "lambda:*"
+        - "lambda:CreateAlias"
+        - "lambda:GetAccountSettings"
+        - "lambda:GetAlias"
+        - "lambda:GetEventSourceMapping"
+        - "lambda:GetFunction"
+        - "lambda:GetFunctionConfiguration"
+        - "lambda:GetPolicy"
+        - "lambda:InvokeAsync"
+        - "lambda:InvokeFunction"
+        - "lambda:ListAliases"
+        - "lambda:ListEventSourceMappings"
+        - "lambda:ListFunctions"
+        - "lambda:ListTags"
+        - "lambda:ListVersionsByFunction"
+        - "lambda:PublishVersion"
+        - "lambda:TagResource"
+        - "lambda:UntagResource"
+        - "lambda:UpdateAlias"
+        - "lambda:UpdateEventSourceMapping"
+        - "lambda:UpdateFunctionCode"
+        - "lambda:UpdateFunctionConfiguration"
 
 package:
   artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.0/publish/deploy-package.zip
