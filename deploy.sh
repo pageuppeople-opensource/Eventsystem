@@ -22,7 +22,28 @@ if [ "$TRAVIS_BRANCH" = "prod" ]; then
     echo "####### Production Deployment Starting"
     export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DC2_5
     export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DC2_5
+
+    echo "####### Deploying DC2"
+    serverless deploy --stage v1 --region ap-southeast-2 --data-center dc2 -v
+
+    echo "####### Deploying DC3"
+    serverless deploy --stage v1 --region eu-west-1 --data-center dc3 -v
+
+    echo "####### Deploying DC4"
     serverless deploy --stage v1 --region us-east-1 --data-center dc4 -v
+
+    echo "####### Deploying DC5"
+    serverless deploy --stage v1 --region ap-southeast-1 --data-center dc5 -v
+
+    echo "####### Deploying DC6"
+    ## export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DC2_5
+    ## export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DC2_5
+    ## serverless deploy --stage v1 --region ap-southeast-1 --data-center dc6 -v
+
+    echo "####### Deploying DC7"
+    ## export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DC2_5
+    ## export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DC2_5
+    ## serverless deploy --stage v1 --region eu-west-1 --data-center dc7 -v
 fi
 
 
