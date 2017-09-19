@@ -26,26 +26,17 @@ provider:
       Resource: "arn:aws:lambda:*:*:function:integration*"
       Action:
         - "lambda:CreateAlias"
-        - "lambda:GetAccountSettings"
-        - "lambda:GetAlias"
-        - "lambda:GetEventSourceMapping"
-        - "lambda:GetFunction"
-        - "lambda:GetFunctionConfiguration"
-        - "lambda:GetPolicy"
-        - "lambda:InvokeAsync"
-        - "lambda:InvokeFunction"
-        - "lambda:ListAliases"
-        - "lambda:ListEventSourceMappings"
-        - "lambda:ListFunctions"
-        - "lambda:ListTags"
-        - "lambda:ListVersionsByFunction"
+        - "lambda:Get*"
+        - "lambda:Invoke*"
+        - "lambda:List*"
         - "lambda:PublishVersion"
         - "lambda:TagResource"
         - "lambda:UntagResource"
-        - "lambda:UpdateAlias"
-        - "lambda:UpdateEventSourceMapping"
-        - "lambda:UpdateFunctionCode"
-        - "lambda:UpdateFunctionConfiguration"
+        - "lambda:Update*"
+    - Effect: "Allow"
+      Resource: "Fn::GetAtt: [ BusinessEventStream, Arn ]"
+      Action:
+        - "kinesis:*"
 
 package:
   artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.0/publish/deploy-package.zip
@@ -68,3 +59,17 @@ functions:
           path: healthcheck
           method: get
           cors: true
+
+  resources:
+    Resources:
+      BusinessEventStream:
+        Type: 'AWS::Kinesis::Stream'
+        Properties:
+          Name: BusinessEventStream
+          DeletionPolicy: Retain
+          RetentionPeriodHours: 24
+          ShardCount: 1
+          Tags:
+            -
+              Key: Stream
+              Value: Glofish
