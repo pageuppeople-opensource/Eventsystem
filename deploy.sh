@@ -1,5 +1,7 @@
 #!/bin/bash
 
+VERSION=$BUILD_VERSION.$TRAVIS_BUILD_NUMBER.$TRAVIS_BRANCH
+
 echo "####### Build version: $BUILD_VERSION"
 echo "####### Travis build version: $TRAVIS_BUILD_NUMBER"
 export SLS_DEBUG=true
@@ -44,6 +46,10 @@ if [ "$TRAVIS_BRANCH" = "prod" ]; then
     export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DC7
     export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DC7
     serverless deploy --stage v1 --region eu-west-1 --data-center dc7 -v
+
+    git tag $VERSION
+    git push origin --tags
+    exit 0
 fi
 
 
