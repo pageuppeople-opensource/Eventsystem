@@ -12,6 +12,7 @@ using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.Kinesis;
 using Amazon.Kinesis.Model;
+using Amazon.Lambda.DynamoDBEvents;
 using Amazon.Lambda.KinesisEvents;
 using Amazon.Lambda.SNSEvents;
 using Autofac;
@@ -188,15 +189,18 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                             TableName = "BusinessEvents",
                             Item = new Dictionary<string, AttributeValue>()
                             {
-                                {"EventId", new AttributeValue {S = @event.Message.Header.MessageId}},
                                 {
-                                    "TransportTimeStamp",
-                                    new AttributeValue
-                                    {
-                                        S = @event.Header.TransportTimeStamp.ToString(CultureInfo.InvariantCulture)
-                                    }
+                                    "MessageId", new AttributeValue {S = @event.Message.Header.MessageId}
                                 },
-                                {"Data", new AttributeValue {S = JsonConvert.SerializeObject(@event).ToCompressedBase64String()}},
+                                {
+                                    "TransportTimeStamp", new AttributeValue { S = @event.Header.TransportTimeStamp.ToString(CultureInfo.InvariantCulture) }
+                                },
+                                {
+                                    "MessageType", new AttributeValue { S = @event.Message.Header.MessageType }
+                                },
+                                {
+                                    "Data", new AttributeValue {S = JsonConvert.SerializeObject(@event).ToCompressedBase64String() }
+                                }
                             }
                         };
                         await dynamodbClient.PutItemAsync(request);
@@ -206,6 +210,28 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                         logger.Log($"DynamoDB Exception: {ex}");
                     }
                 }
+            }
+        }
+
+        public async Task ProcessDynamoDBStream(DynamoDBEvent dynamoDbEvent, ILambdaContext context)
+        {
+            var logger = context.Logger;
+            var serviceProcess = Container.Resolve<IServiceProcess>();
+            logger.Log(JsonConvert.SerializeObject(dynamoDbEvent));
+            foreach (var record in dynamoDbEvent.Records)
+            {
+                Event @event;
+
+                if (!record.Dynamodb.NewImage.ContainsKey("Data"))
+                {
+                    logger.Log("Skip");
+                    continue;
+                }
+
+                var recordImage = record.Dynamodb.NewImage;
+                @event = JsonConvert.DeserializeObject<Event>(recordImage["Data"].S.ToUncompressedString());
+                logger.Log(JsonConvert.SerializeObject(@event));
+                await serviceProcess.Process(@event);
             }
         }
     }

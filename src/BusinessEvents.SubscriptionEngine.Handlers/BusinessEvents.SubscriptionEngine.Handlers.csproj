@@ -12,6 +12,7 @@
     <RootNamespace>BusinessEvents.SubscriptionEngine.Handlers</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.DynamoDBEvents" Version="1.0.1" />
     <PackageReference Include="Amazon.Lambda.KinesisEvents" Version="1.0.1" />
     <PackageReference Include="Amazon.Lambda.Logging.AspNetCore" Version="1.1.0" />
     <PackageReference Include="Amazon.Lambda.SNSEvents" Version="1.0.0" />

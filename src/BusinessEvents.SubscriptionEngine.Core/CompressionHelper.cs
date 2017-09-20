@@ -14,7 +14,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
         {
             // convert the source string into a memory stream
             using (
-                MemoryStream inMemStream = new MemoryStream(Encoding.ASCII.GetBytes(source)),
+                MemoryStream inMemStream = new MemoryStream(Encoding.UTF8.GetBytes(source)),
                     outMemStream = new MemoryStream())
             {
                 // create a compression stream with the output stream
@@ -45,7 +45,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             // load the byte array into a memory stream
             using (var inMemStream = new MemoryStream(compressedBytes))
                 // and decompress the memory stream into the original string
-            using (var decompressionStream = new DeflateStream(inMemStream, CompressionMode.Decompress))
+            using (var decompressionStream = new GZipStream(inMemStream, CompressionMode.Decompress))
             using (var streamReader = new StreamReader(decompressionStream))
                 return streamReader.ReadToEnd();
         }

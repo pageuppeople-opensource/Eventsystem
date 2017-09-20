@@ -13,7 +13,6 @@ provider:
     AUTH_ENDPOINT: ${self:custom.${opt:data-center}.AUTH_ENDPOINT}
   iamRoleStatements:
     - Effect: "Allow"
-      Resource: "*"
       Action:
         - "sns:*"
         - "logs:CreateLogGroup"
@@ -25,8 +24,8 @@ provider:
         - "s3:GetObject"
         - "s3:CreateBucket"
         - "s3:PutBucket"
+      Resource: "*"
     - Effect: "Allow"
-      Resource: "arn:aws:lambda:*:*:function:integration*"
       Action:
         - "lambda:CreateAlias"
         - "lambda:Get*"
@@ -36,17 +35,20 @@ provider:
         - "lambda:TagResource"
         - "lambda:UntagResource"
         - "lambda:Update*"
+      Resource: "arn:aws:lambda:*:*:function:integration*"
     - Effect: "Allow"
-      Resource: "arn:aws:dynamodb:*:*:table/BusinessEvents"
       Action:
         - "dynamodb:*"
+      Resource:
+        - "arn:aws:dynamodb:*:*:table/BusinessEvents"
+        - "arn:aws:dynamodb:*:*:table/BusinessEvents/stream/*"
     - Effect: "Allow"
+      Action:
+        - "kinesis:*"
       Resource:
         Fn::GetAtt:
           - BusinessEventStream
           - Arn
-      Action:
-        - "kinesis:*"
 
 package:
   artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.0/publish/deploy-package.zip
@@ -54,11 +56,22 @@ package:
 functions:
   handle:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::Handle
-    events:
-      - sns: BusinessEvents
     environment:
       AUTH_CLIENT_ID: ${self:custom.${opt:data-center}.AUTH_CLIENT_ID}
       AUTH_CLIENT_SECRET: ${self:custom.${opt:data-center}.AUTH_CLIENT_SECRET}
+
+  process-dynamodb-stream:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessDynamoDBStream
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+               - BusinessEventStore
+               - StreamArn
+          batchSize: 100
+          startingPosition: LATEST
+          enabled: true
 
   process-kinesis-stream:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessKinesisStream
@@ -108,15 +121,16 @@ resources:
 
     BusinessEventStore:
       Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
       Properties:
         TableName: BusinessEvents
         AttributeDefinitions:
-          - AttributeName: EventId
+          - AttributeName: MessageId
             AttributeType: S
           - AttributeName: TransportTimeStamp
             AttributeType: S
         KeySchema:
-          - AttributeName: EventId
+          - AttributeName: MessageId
             KeyType: HASH
           - AttributeName: TransportTimeStamp
             KeyType: RANGE
