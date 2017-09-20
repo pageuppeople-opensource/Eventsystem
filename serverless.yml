@@ -8,6 +8,9 @@ provider:
   stage: v1
   region: ap-southeast-2
   deploymentBucket: pageup-serverless-${opt:data-center}-deploy
+  environment:
+    DATA_CENTER: ${opt:data-center}
+    AUTH_ENDPOINT: ${self:custom.${opt:data-center}.AUTH_ENDPOINT}
   iamRoleStatements:
     - Effect: "Allow"
       Resource: "*"
@@ -34,7 +37,14 @@ provider:
         - "lambda:UntagResource"
         - "lambda:Update*"
     - Effect: "Allow"
-      Resource: "Fn::GetAtt: [ BusinessEventStream, Arn ]"
+      Resource: "arn:aws:dynamodb:*:*:table/BusinessEvents"
+      Action:
+        - "dynamodb:*"
+    - Effect: "Allow"
+      Resource:
+        Fn::GetAtt:
+          - BusinessEventStream
+          - Arn
       Action:
         - "kinesis:*"
 
@@ -44,14 +54,25 @@ package:
 functions:
   handle:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::Handle
-    awsKmsKeyArn: ${self:custom.${opt:data-center}.KMS_KEY_ARN}
     events:
       - sns: BusinessEvents
     environment:
       AUTH_CLIENT_ID: ${self:custom.${opt:data-center}.AUTH_CLIENT_ID}
-      AUTH_ENDPOINT: ${self:custom.${opt:data-center}.AUTH_ENDPOINT}
       AUTH_CLIENT_SECRET: ${self:custom.${opt:data-center}.AUTH_CLIENT_SECRET}
-      DATA_CENTER: ${opt:data-center}
+
+  process-kinesis-stream:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessKinesisStream
+    events:
+      - stream:
+          type: kinesis
+          arn:
+            Fn::GetAtt:
+               - BusinessEventStream
+               - Arn
+          batchSize: 100
+          startingPosition: LATEST
+          enabled: true
+
   healthcheck:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::HealthCheck
     events:
@@ -60,16 +81,53 @@ functions:
           method: get
           cors: true
 
-  resources:
-    Resources:
-      BusinessEventStream:
-        Type: 'AWS::Kinesis::Stream'
-        Properties:
-          Name: BusinessEventStream
-          DeletionPolicy: Retain
-          RetentionPeriodHours: 24
-          ShardCount: 1
-          Tags:
-            -
-              Key: Stream
+  event:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::Event
+    events:
+      - http:
+          path: event
+          method: post
+          cors: true
+    environment:
+      KINESIS_STREAM_NAME:
+        Ref: "BusinessEventStream"
+
+resources:
+  Resources:
+    BusinessEventStream:
+      Type: 'AWS::Kinesis::Stream'
+      Properties:
+        Name: business-event-stream
+        RetentionPeriodHours: 24
+        ShardCount: 1
+        Tags:
+          - Key: Stream
+            Value: Glofish
+          - Key: Service
+            Value: ${self:service}
+
+    BusinessEventStore:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: BusinessEvents
+        AttributeDefinitions:
+          - AttributeName: EventId
+            AttributeType: S
+          - AttributeName: TransportTimeStamp
+            AttributeType: S
+        KeySchema:
+          - AttributeName: EventId
+            KeyType: HASH
+          - AttributeName: TransportTimeStamp
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        StreamSpecification:
+            StreamViewType: NEW_IMAGE
+        Tags:
+            - Key: Stream
               Value: Glofish
+            - Key: Service
+              Value: ${self:service}
+
