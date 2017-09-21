@@ -40,8 +40,8 @@ provider:
       Action:
         - "dynamodb:*"
       Resource:
-        - "arn:aws:dynamodb:*:*:table/BusinessEvents"
-        - "arn:aws:dynamodb:*:*:table/BusinessEvents/stream/*"
+        - "arn:aws:dynamodb:*:*:table/BusinessEvents*"
+        - "arn:aws:dynamodb:*:*:table/BusinessEvents*/stream/*"
     - Effect: "Allow"
       Action:
         - "kinesis:*"
@@ -54,20 +54,17 @@ package:
   artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.0/publish/deploy-package.zip
 
 functions:
-  handle:
-    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::Handle
+  process-dynamodb-stream:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessDynamoDBStream
     environment:
       AUTH_CLIENT_ID: ${self:custom.${opt:data-center}.AUTH_CLIENT_ID}
       AUTH_CLIENT_SECRET: ${self:custom.${opt:data-center}.AUTH_CLIENT_SECRET}
-
-  process-dynamodb-stream:
-    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessDynamoDBStream
     events:
       - stream:
           type: dynamodb
           arn:
             Fn::GetAtt:
-               - BusinessEventStore
+               - BusinessEventTable
                - StreamArn
           batchSize: 100
           startingPosition: LATEST
@@ -119,29 +116,44 @@ resources:
           - Key: Service
             Value: ${self:service}
 
-    BusinessEventStore:
+    BusinessEventTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
       Properties:
-        TableName: BusinessEvents
+        TableName: BusinessEventsTemp
         AttributeDefinitions:
           - AttributeName: MessageId
             AttributeType: S
-          - AttributeName: TransportTimeStamp
+          - AttributeName: MessageType
+            AttributeType: S
+          - AttributeName: PublishedTimeStampUtc
             AttributeType: S
         KeySchema:
           - AttributeName: MessageId
             KeyType: HASH
-          - AttributeName: TransportTimeStamp
+          - AttributeName: PublishedTimeStampUtc
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
         StreamSpecification:
             StreamViewType: NEW_IMAGE
+        GlobalSecondaryIndexes:
+          - IndexName: gidx_MessageType
+            KeySchema:
+              - AttributeName: MessageType
+                KeyType: HASH
+              - AttributeName: PublishedTimeStampUtc
+                KeyType: RANGE
+            Projection:
+              ProjectionType: KEYS_ONLY
+            ProvisionedThroughput:
+              ReadCapacityUnits: "5"
+              WriteCapacityUnits: "5"
         Tags:
             - Key: Stream
               Value: Glofish
             - Key: Service
               Value: ${self:service}
+
 

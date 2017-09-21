@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BusinessEvents.SubscriptionEngine.Core
 {
-    public static class CompressionHelper
+    public static class StringCompressionExtension
     {
         /// <summary>
         /// Returns the byte array of a compressed string

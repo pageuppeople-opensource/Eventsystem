@@ -186,14 +186,20 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                     {
                         var request = new PutItemRequest
                         {
-                            TableName = "BusinessEvents",
+                            TableName = "BusinessEventsTemp",
                             Item = new Dictionary<string, AttributeValue>()
                             {
                                 {
                                     "MessageId", new AttributeValue {S = @event.Message.Header.MessageId}
                                 },
                                 {
-                                    "TransportTimeStamp", new AttributeValue { S = @event.Header.TransportTimeStamp.ToString(CultureInfo.InvariantCulture) }
+                                    "CorrelationId", new AttributeValue {S = @event.Message.Header.CorrelationId}
+                                },
+                                {
+                                    "PublishedTimeStampUtc", new AttributeValue { S = @event.Header.TransportTimeStamp.ToString(CultureInfo.InvariantCulture) }
+                                },
+                                {
+                                    "CreatedTimeStampUtc", new AttributeValue { S = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture) }
                                 },
                                 {
                                     "MessageType", new AttributeValue { S = @event.Message.Header.MessageType }

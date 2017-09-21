@@ -19,11 +19,11 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
         {
             var slackText = new
             {
-                text = JsonConvert.SerializeObject(new { @event.Header, MessageHeader = @event.Message.Header })
+                text = JsonConvert.SerializeObject(new { PublishedDate = DateTime.Now, @event.Header, MessageHeader = @event.Message.Header })
             };
 
             var payloadJson = JsonConvert.SerializeObject(slackText);
-           
+
             using (var httpclient = new HttpClient())
             {
                 try
