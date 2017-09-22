@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
+using Amazon.KeyManagementService;
+using Amazon.KeyManagementService.Model;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.Kinesis;
@@ -18,6 +20,7 @@ using Amazon.Lambda.SNSEvents;
 using Autofac;
 using BusinessEvents.SubscriptionEngine.Core;
 using BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement;
+using BusinessEvents.SubscriptionEngine.Core.Security;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PageUp.Events;
@@ -163,7 +166,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                 using (var sr = new StreamReader(record.Kinesis.Data))
                 {
                     var message = sr.ReadToEnd();
-                    logger.Log($"Raw Message: {message}");
+
                     Event @event;
                     try
                     {
@@ -181,6 +184,12 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                         await MarkAsDeadLetter(message, jsonException);
                         continue;
                     }
+
+                    logger.Log($"Raw Data: {JsonConvert.SerializeObject(@event)}");
+
+                    logger.Log($"Encrypted Data: {JsonConvert.SerializeObject(@event).Encrypt()}");
+
+                    logger.Log($"Encrypted + Compression Data: {JsonConvert.SerializeObject(@event).Encrypt().ToCompressedBase64String()}");
 
                     try
                     {
@@ -205,7 +214,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                                     "MessageType", new AttributeValue { S = @event.Message.Header.MessageType }
                                 },
                                 {
-                                    "Data", new AttributeValue {S = JsonConvert.SerializeObject(@event).ToCompressedBase64String() }
+                                    "Data", new AttributeValue {S = JsonConvert.SerializeObject(@event).Encrypt().ToCompressedBase64String() }
                                 }
                             }
                         };
@@ -235,7 +244,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                 }
 
                 var recordImage = record.Dynamodb.NewImage;
-                @event = JsonConvert.DeserializeObject<Event>(recordImage["Data"].S.ToUncompressedString());
+                @event = JsonConvert.DeserializeObject<Event>(recordImage["Data"].S.ToUncompressedString().Decrypt());
                 logger.Log(JsonConvert.SerializeObject(@event));
                 await serviceProcess.Process(@event);
             }
