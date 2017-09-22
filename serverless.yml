@@ -11,6 +11,7 @@ provider:
   environment:
     DATA_CENTER: ${opt:data-center}
     AUTH_ENDPOINT: ${self:custom.${opt:data-center}.AUTH_ENDPOINT}
+    DATA_ENCRYPTION_KEY: ${self:custom.${opt:data-center}.DATA_ENCRYPTION_KEY}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -103,57 +104,4 @@ functions:
         Ref: "BusinessEventStream"
 
 resources:
-  Resources:
-    BusinessEventStream:
-      Type: 'AWS::Kinesis::Stream'
-      Properties:
-        Name: business-event-stream
-        RetentionPeriodHours: 24
-        ShardCount: 1
-        Tags:
-          - Key: Stream
-            Value: Glofish
-          - Key: Service
-            Value: ${self:service}
-
-    BusinessEventTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        TableName: BusinessEventsTemp
-        AttributeDefinitions:
-          - AttributeName: MessageId
-            AttributeType: S
-          - AttributeName: MessageType
-            AttributeType: S
-          - AttributeName: PublishedTimeStampUtc
-            AttributeType: S
-        KeySchema:
-          - AttributeName: MessageId
-            KeyType: HASH
-          - AttributeName: PublishedTimeStampUtc
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
-        StreamSpecification:
-            StreamViewType: NEW_IMAGE
-        GlobalSecondaryIndexes:
-          - IndexName: gidx_MessageType
-            KeySchema:
-              - AttributeName: MessageType
-                KeyType: HASH
-              - AttributeName: PublishedTimeStampUtc
-                KeyType: RANGE
-            Projection:
-              ProjectionType: KEYS_ONLY
-            ProvisionedThroughput:
-              ReadCapacityUnits: "5"
-              WriteCapacityUnits: "5"
-        Tags:
-            - Key: Stream
-              Value: Glofish
-            - Key: Service
-              Value: ${self:service}
-
-
+  Resources: ${file(cloudformation-resources.yml)}

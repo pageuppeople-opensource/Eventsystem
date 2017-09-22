@@ -22,7 +22,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Security
             var kmsClient = new AmazonKeyManagementServiceClient(RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION")));
             var decryptResponse = kmsClient.DecryptAsync(new DecryptRequest()
             {
-                CiphertextBlob = new MemoryStream(Convert.FromBase64String(Environment.GetEnvironmentVariable("AWS_REGION")))
+                CiphertextBlob = new MemoryStream(Convert.FromBase64String(Environment.GetEnvironmentVariable("DATA_ENCRYPTION_KEY")))
             }).Result;
 
             _encryptionKey = Convert.ToBase64String(decryptResponse.Plaintext.ToArray());

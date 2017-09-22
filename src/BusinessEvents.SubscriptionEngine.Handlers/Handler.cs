@@ -185,7 +185,9 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                         continue;
                     }
 
+                    // todo: remove below
                     logger.Log($"Raw Data: {JsonConvert.SerializeObject(@event)}");
+                    // todo: remove above
 
                     logger.Log($"Encrypted Data: {JsonConvert.SerializeObject(@event).Encrypt()}");
 
@@ -245,7 +247,9 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
                 var recordImage = record.Dynamodb.NewImage;
                 @event = JsonConvert.DeserializeObject<Event>(recordImage["Data"].S.ToUncompressedString().Decrypt());
+                // todo: removed below
                 logger.Log(JsonConvert.SerializeObject(@event));
+                // todo: remove above
                 await serviceProcess.Process(@event);
             }
         }

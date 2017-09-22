@@ -1,0 +1,250 @@
+###
+# AWS Cloudwatch
+# You can override the specific CloudFormation resource to apply your own options. For example, if you want to set AWS::Logs::LogGroup retention time to 30 days, override it with above table's Name Template.
+
+# When you do overriding the basic resources, the important part is normalizedFunctionName. There are two rules.
+
+# Should start with uppercase character.
+# The - will be changed to Dash, _ will be changed to Underscore.
+###
+ProcessDashdynamodbDashstreamLogGroup:
+  Type: "AWS::Logs::LogGroup"
+  Properties:
+    RetentionInDays: "90"
+
+ProcessDashkinesisDashstreamLogGroup:
+  Type: "AWS::Logs::LogGroup"
+  Properties:
+    RetentionInDays: "90"
+
+EventLogGroup:
+  Type: "AWS::Logs::LogGroup"
+  Properties:
+    RetentionInDays: "90"
+
+HealthcheckLogGroup:
+  Type: "AWS::Logs::LogGroup"
+  Properties:
+    RetentionInDays: "90"
+
+###
+# Kinesis Stream
+###
+BusinessEventStream:
+  Type: 'AWS::Kinesis::Stream'
+  Properties:
+    Name: business-event-stream
+    RetentionPeriodHours: 24
+    ShardCount: 1
+    Tags:
+      - Key: Stream
+        Value: Glofish
+      - Key: Service
+        Value: ${self:service}
+
+###
+# DynamoDB Table Business Events
+###
+BusinessEventTable:
+  Type: 'AWS::DynamoDB::Table'
+  DeletionPolicy: Retain
+  Properties:
+    TableName: BusinessEventsTemp
+    AttributeDefinitions:
+      - AttributeName: MessageId
+        AttributeType: S
+      - AttributeName: MessageType
+        AttributeType: S
+      - AttributeName: PublishedTimeStampUtc
+        AttributeType: S
+    KeySchema:
+      - AttributeName: MessageId
+        KeyType: HASH
+      - AttributeName: PublishedTimeStampUtc
+        KeyType: RANGE
+    ProvisionedThroughput:
+      ReadCapacityUnits: 5
+      WriteCapacityUnits: 5
+    StreamSpecification:
+        StreamViewType: NEW_IMAGE
+    GlobalSecondaryIndexes:
+      - IndexName: gidx_MessageType
+        KeySchema:
+          - AttributeName: MessageType
+            KeyType: HASH
+          - AttributeName: PublishedTimeStampUtc
+            KeyType: RANGE
+        Projection:
+          ProjectionType: KEYS_ONLY
+        ProvisionedThroughput:
+          ReadCapacityUnits: "5"
+          WriteCapacityUnits: "5"
+    Tags:
+        - Key: Stream
+          Value: Glofish
+        - Key: Service
+          Value: ${self:service}
+
+ScalingRole:
+  Type: "AWS::IAM::Role"
+  Properties:
+    AssumeRolePolicyDocument:
+      Version: "2012-10-17"
+      Statement:
+        -
+          Effect: "Allow"
+          Principal:
+            Service:
+              - application-autoscaling.amazonaws.com
+          Action:
+            - "sts:AssumeRole"
+    Path: "/"
+    Policies:
+      -
+        PolicyName: "root"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            -
+              Effect: "Allow"
+              Action:
+                - "dynamodb:DescribeTable"
+                - "dynamodb:UpdateTable"
+                - "cloudwatch:PutMetricAlarm"
+                - "cloudwatch:DescribeAlarms"
+                - "cloudwatch:GetMetricStatistics"
+                - "cloudwatch:SetAlarmState"
+                - "cloudwatch:DeleteAlarms"
+              Resource: "*"
+
+BusinessEventTableWriteCapacityScalableTarget:
+  Type: "AWS::ApplicationAutoScaling::ScalableTarget"
+  Properties:
+    MaxCapacity: 200
+    MinCapacity: 10
+    ResourceId:
+      Fn::Join:
+        - /
+        - - table
+          - Ref:
+              BusinessEventTable
+    RoleARN:
+      Fn::GetAtt:
+         - ScalingRole
+         - Arn
+    ScalableDimension: dynamodb:table:WriteCapacityUnits
+    ServiceNamespace: dynamodb
+
+BusinessEventTableWriteScalingPolicy:
+  Type: "AWS::ApplicationAutoScaling::ScalingPolicy"
+  Properties:
+    PolicyName: WriteAutoScalingPolicy
+    PolicyType: TargetTrackingScaling
+    ScalingTargetId:
+      Ref: BusinessEventTableWriteCapacityScalableTarget
+    TargetTrackingScalingPolicyConfiguration:
+      TargetValue: 70.0
+      ScaleInCooldown: 60
+      ScaleOutCooldown: 60
+      PredefinedMetricSpecification:
+        PredefinedMetricType: DynamoDBWriteCapacityUtilization
+
+BusinessEventTableReadCapacityScalableTarget:
+  Type: "AWS::ApplicationAutoScaling::ScalableTarget"
+  Properties:
+    MaxCapacity: 200
+    MinCapacity: 10
+    ResourceId:
+      Fn::Join:
+        - /
+        - - table
+          - Ref:
+              BusinessEventTable
+    RoleARN:
+      Fn::GetAtt:
+         - ScalingRole
+         - Arn
+    ScalableDimension: dynamodb:table:ReadCapacityUnits
+    ServiceNamespace: dynamodb
+
+BusinessEventTableReadScalingPolicy:
+  Type: "AWS::ApplicationAutoScaling::ScalingPolicy"
+  Properties:
+    PolicyName: ReadAutoScalingPolicy
+    PolicyType: TargetTrackingScaling
+    ScalingTargetId:
+      Ref: BusinessEventTableReadCapacityScalableTarget
+    TargetTrackingScalingPolicyConfiguration:
+      TargetValue: 70.0
+      ScaleInCooldown: 60
+      ScaleOutCooldown: 60
+      PredefinedMetricSpecification:
+        PredefinedMetricType: DynamoDBReadCapacityUtilization
+
+BusinessEventTableGlobalIndexMessageTypeReadCapacityScalableTarget:
+  Type: "AWS::ApplicationAutoScaling::ScalableTarget"
+  Properties:
+    MaxCapacity: 200
+    MinCapacity: 10
+    ResourceId:
+      Fn::Join:
+        - /
+        - - table
+          - Ref:
+              BusinessEventTable
+          - index
+          - gidx_MessageType
+    RoleARN:
+      Fn::GetAtt:
+         - ScalingRole
+         - Arn
+    ScalableDimension: dynamodb:index:ReadCapacityUnits
+    ServiceNamespace: dynamodb
+
+BusinessEventTableGlobalIndexMessageTypeReadScalingPolicy:
+  Type: "AWS::ApplicationAutoScaling::ScalingPolicy"
+  Properties:
+    PolicyName: ReadAutoScalingPolicy
+    PolicyType: TargetTrackingScaling
+    ScalingTargetId:
+      Ref: BusinessEventTableGlobalIndexMessageTypeReadCapacityScalableTarget
+    TargetTrackingScalingPolicyConfiguration:
+      TargetValue: 70.0
+      ScaleInCooldown: 60
+      ScaleOutCooldown: 60
+      PredefinedMetricSpecification:
+        PredefinedMetricType: DynamoDBReadCapacityUtilization
+
+BusinessEventTableGlobalIndexMessageTypeWriteCapacityScalableTarget:
+  Type: "AWS::ApplicationAutoScaling::ScalableTarget"
+  Properties:
+    MaxCapacity: 200
+    MinCapacity: 10
+    ResourceId:
+      Fn::Join:
+        - /
+        - - table
+          - Ref:
+              BusinessEventTable
+          - index
+          - gidx_MessageType
+    RoleARN:
+      Fn::GetAtt:
+         - ScalingRole
+         - Arn
+    ScalableDimension: dynamodb:index:WriteCapacityUnits
+    ServiceNamespace: dynamodb
+
+BusinessEventTableGlobalIndexMessageTypeWriteScalingPolicy:
+  Type: "AWS::ApplicationAutoScaling::ScalingPolicy"
+  Properties:
+    PolicyName: WriteAutoScalingPolicy
+    PolicyType: TargetTrackingScaling
+    ScalingTargetId:
+      Ref: BusinessEventTableGlobalIndexMessageTypeWriteCapacityScalableTarget
+    TargetTrackingScalingPolicyConfiguration:
+      TargetValue: 70.0
+      ScaleInCooldown: 60
+      ScaleOutCooldown: 60
+      PredefinedMetricSpecification:
+        PredefinedMetricType: DynamoDBWriteCapacityUtilization
