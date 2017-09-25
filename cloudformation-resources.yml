@@ -17,7 +17,17 @@ ProcessDashkinesisDashstreamLogGroup:
   Properties:
     RetentionInDays: "90"
 
-EventLogGroup:
+EventDashpostLogGroup:
+  Type: "AWS::Logs::LogGroup"
+  Properties:
+    RetentionInDays: "90"
+
+EventDashgetLogGroup:
+  Type: "AWS::Logs::LogGroup"
+  Properties:
+    RetentionInDays: "90"
+
+EventDashatomDashstreamLogGroup:
   Type: "AWS::Logs::LogGroup"
   Properties:
     RetentionInDays: "90"
@@ -49,7 +59,7 @@ BusinessEventTable:
   Type: 'AWS::DynamoDB::Table'
   DeletionPolicy: Retain
   Properties:
-    TableName: BusinessEventsTemp
+    TableName: BusinessEvent
     AttributeDefinitions:
       - AttributeName: MessageId
         AttributeType: S

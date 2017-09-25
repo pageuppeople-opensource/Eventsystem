@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ using Amazon.Kinesis.Model;
 using Amazon.Lambda.DynamoDBEvents;
 using Amazon.Lambda.KinesisEvents;
 using Amazon.Lambda.SNSEvents;
+using Amazon.Runtime.Internal;
 using Autofac;
 using BusinessEvents.SubscriptionEngine.Core;
 using BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement;
@@ -91,7 +93,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
         // You are in a bubble here. And this bubble will become big
 
-        public async Task<APIGatewayProxyResponse> Event(APIGatewayProxyRequest request, ILambdaContext context)
+        public async Task<APIGatewayProxyResponse> PostEvent(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var logger = context.Logger;
             logger.Log(JsonConvert.SerializeObject(request));
@@ -153,6 +155,110 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             };
         }
 
+        public async Task<APIGatewayProxyResponse> GetEvent(APIGatewayProxyRequest request, ILambdaContext context)
+        {
+            var logger = context.Logger;
+            logger.Log(JsonConvert.SerializeObject(request));
+            var messageId = request.PathParameters.ContainsKey("messageId") ? request.PathParameters["messageId"] : throw new HttpRequestException("Bad Request");
+
+            var item = await GetEventByMessageId(messageId);
+
+            return new APIGatewayProxyResponse()
+            {
+                StatusCode = 200,
+                Headers = new Dictionary<string, string>() { {"Context-Type", "application/json"} },
+                Body = JsonConvert.SerializeObject(item)
+            };
+        }
+
+        public async Task<APIGatewayProxyResponse> AtomStreamEvents(APIGatewayProxyRequest request, ILambdaContext context)
+        {
+            var logger = context.Logger;
+            logger.Log(JsonConvert.SerializeObject(request));
+
+            // stream is the event type
+            var stream = request.PathParameters.ContainsKey("stream") ? request.PathParameters["stream"] : throw new HttpRequestException("Bad Request");
+            // pointer can be a requestid, head, or last
+            var pointer = request.PathParameters.ContainsKey("pointer") ? request.PathParameters["pointer"] : throw new HttpRequestException("Bad Request");
+            // backward or forward
+            // todo: validate direction
+            var direction = request.PathParameters.ContainsKey("direction") ? request.PathParameters["direction"] : throw new HttpRequestException("Bad Request");
+            // the size per page
+            // todo: validate pagesize
+            var pageSize = request.PathParameters.ContainsKey("pagesize") ? request.PathParameters["pagesize"] : "20";
+
+            var queryRequest = new QueryRequest()
+            {
+                TableName = "BusinessEvent",
+                IndexName = "gidx_MessageType",
+                Limit = Convert.ToInt32(pageSize),
+                ProjectionExpression = "MessageId, PublishedTimeStampUtc, MessageType",
+                KeyConditionExpression = "MessageType = :messageType",
+                ReturnConsumedCapacity = new ReturnConsumedCapacity("INDEXES"),
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
+                {
+                    { ":messageType", new AttributeValue() { S = stream }}
+                }
+            };
+
+            switch (pointer)
+            {
+                case "head":
+                    queryRequest.ScanIndexForward = false;
+                    break;
+                case "last":
+                    queryRequest.ScanIndexForward = true;
+                    break;
+                default:
+                    var exclusiveStartKey = await GetEventByMessageId(pointer, "MessageId, PublishedTimeStampUtc, MessageType");
+                    queryRequest.ScanIndexForward = (direction == "forward");
+                    queryRequest.ExclusiveStartKey = exclusiveStartKey;
+                    break;
+            }
+
+            var dynamodbClient = new AmazonDynamoDBClient(RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION")));
+
+            var queryResponse = await dynamodbClient.QueryAsync(queryRequest);
+
+            logger.Log(JsonConvert.SerializeObject(queryResponse));
+
+            // note that the response for N items may not be complete if the size of data to return exceeds the provisioned capacity
+            // so one or more queries are needed to get remaining number of items.
+
+            return new APIGatewayProxyResponse()
+            {
+                StatusCode = 200,
+                Headers = new Dictionary<string, string>() { {"Context-Type", "application/json"} },
+                Body = JsonConvert.SerializeObject(queryResponse)
+            };
+        }
+
+        private async Task<Dictionary<string, AttributeValue>> GetEventByMessageId(string messageId, string projectionExpression = "")
+        {
+            var dynamodbClient = new AmazonDynamoDBClient(RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION")));
+
+            var queryRequest = new QueryRequest()
+            {
+                TableName = "BusinessEvent",
+                ScanIndexForward = true,
+                Limit = 1,
+                ProjectionExpression = !string.IsNullOrWhiteSpace(projectionExpression) ? projectionExpression : "MessageId, CorrelationId, CreatedTimeStampUtc, PublishedTimeStampUtc, MessageType, #data",
+                KeyConditionExpression = "MessageId = :messageId",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
+                {
+                    { ":messageId", new AttributeValue() { S = messageId }}
+                },
+                ExpressionAttributeNames =  new AutoConstructedDictionary<string, string>()
+                {
+                    {"#data", "Data"}
+                }
+            };
+
+            var queryResponse = await dynamodbClient.QueryAsync(queryRequest);
+
+            return queryResponse.Items.Any() ? queryResponse.Items[0] : new Dictionary<string, AttributeValue>();
+        }
+
         // You are in another bubble, and this bubble is to handle kinesis events
 
         public async Task ProcessKinesisStream(KinesisEvent kinesisEvent, ILambdaContext context)
@@ -197,7 +303,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                     {
                         var request = new PutItemRequest
                         {
-                            TableName = "BusinessEventsTemp",
+                            TableName = "BusinessEvent",
                             Item = new Dictionary<string, AttributeValue>()
                             {
                                 {
@@ -207,10 +313,10 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                                     "CorrelationId", new AttributeValue {S = @event.Message.Header.CorrelationId}
                                 },
                                 {
-                                    "PublishedTimeStampUtc", new AttributeValue { S = @event.Header.TransportTimeStamp.ToString(CultureInfo.InvariantCulture) }
+                                    "PublishedTimeStampUtc", new AttributeValue { S = @event.Header.TransportTimeStamp.ToString("o", CultureInfo.InvariantCulture) }
                                 },
                                 {
-                                    "CreatedTimeStampUtc", new AttributeValue { S = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture) }
+                                    "CreatedTimeStampUtc", new AttributeValue { S = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture) }
                                 },
                                 {
                                     "MessageType", new AttributeValue { S = @event.Message.Header.MessageType }

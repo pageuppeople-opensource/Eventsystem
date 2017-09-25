@@ -41,8 +41,9 @@ provider:
       Action:
         - "dynamodb:*"
       Resource:
-        - "arn:aws:dynamodb:*:*:table/BusinessEvents*"
-        - "arn:aws:dynamodb:*:*:table/BusinessEvents*/stream/*"
+        - "arn:aws:dynamodb:*:*:table/BusinessEvent"
+        - "arn:aws:dynamodb:*:*:table/BusinessEvent/stream/*"
+        - "arn:aws:dynamodb:*:*:table/BusinessEvent/index/*"
     - Effect: "Allow"
       Action:
         - "kinesis:*"
@@ -70,6 +71,9 @@ functions:
           batchSize: 100
           startingPosition: LATEST
           enabled: true
+    tags:
+      stream: "Glofish"
+      service: ${self:service}
 
   process-kinesis-stream:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessKinesisStream
@@ -83,6 +87,9 @@ functions:
           batchSize: 100
           startingPosition: LATEST
           enabled: true
+    tags:
+      stream: "Glofish"
+      service: ${self:service}
 
   healthcheck:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::HealthCheck
@@ -91,9 +98,12 @@ functions:
           path: healthcheck
           method: get
           cors: true
+    tags:
+      stream: "Glofish"
+      service: ${self:service}
 
-  event:
-    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::Event
+  event-post:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::PostEvent
     events:
       - http:
           path: event
@@ -102,6 +112,31 @@ functions:
     environment:
       KINESIS_STREAM_NAME:
         Ref: "BusinessEventStream"
+    tags:
+      stream: "Glofish"
+      service: ${self:service}
+
+  event-get:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::GetEvent
+    events:
+      - http:
+          path: event/{messageId}
+          method: get
+          cors: true
+    tags:
+      stream: "Glofish"
+      service: ${self:service}
+
+  event-atom-stream:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::AtomStreamEvents
+    events:
+      - http:
+          path: event/stream/{stream}/{pointer}/{direction}/{pagesize}
+          method: get
+          cors: true
+    tags:
+      stream: "Glofish"
+      service: ${self:service}
 
 resources:
   Resources: ${file(cloudformation-resources.yml)}
