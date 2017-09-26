@@ -57,7 +57,7 @@ package:
 
 functions:
   process-dynamodb-stream:
-    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessDynamoDBStream
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessDynamoDbStream
     environment:
       AUTH_CLIENT_ID: ${self:custom.${opt:data-center}.AUTH_CLIENT_ID}
       AUTH_CLIENT_SECRET: ${self:custom.${opt:data-center}.AUTH_CLIENT_SECRET}

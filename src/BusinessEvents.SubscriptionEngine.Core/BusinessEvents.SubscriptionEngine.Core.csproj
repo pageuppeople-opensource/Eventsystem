@@ -18,8 +18,14 @@
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="AWSSDK.DynamoDBv2, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
+      <HintPath>..\..\..\..\Users\terence.tham\.nuget\packages\awssdk.dynamodbv2\3.3.4.17\lib\netstandard1.3\AWSSDK.DynamoDBv2.dll</HintPath>
+    </Reference>
     <Reference Include="AWSSDK.KeyManagementService, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
       <HintPath>..\..\..\..\Users\terence.tham\.nuget\packages\awssdk.keymanagementservice\3.3.3.1\lib\netstandard1.3\AWSSDK.KeyManagementService.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.Kinesis, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
+      <HintPath>..\..\..\..\Users\terence.tham\.nuget\packages\awssdk.kinesis\3.3.3\lib\netstandard1.3\AWSSDK.Kinesis.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

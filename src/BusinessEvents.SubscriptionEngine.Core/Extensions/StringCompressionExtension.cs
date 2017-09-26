@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 
-namespace BusinessEvents.SubscriptionEngine.Core
+namespace BusinessEvents.SubscriptionEngine.Core.Extensions
 {
     public static class StringCompressionExtension
     {

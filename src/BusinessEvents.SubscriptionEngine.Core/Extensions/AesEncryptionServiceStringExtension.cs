@@ -1,14 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Security;
 using System.Security.Cryptography;
 using System.Text;
-using Amazon;
-using Amazon.KeyManagementService;
 using Amazon.KeyManagementService.Model;
-using NSubstitute.Core;
+using BusinessEvents.SubscriptionEngine.Core.Factories;
 
-namespace BusinessEvents.SubscriptionEngine.Core.Security
+namespace BusinessEvents.SubscriptionEngine.Core.Extensions
 {
     public static class AesEncryptionServiceStringExtension
     {
@@ -19,7 +16,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Security
         {
             if (!string.IsNullOrEmpty(_encryptionKey)) return;
 
-            var kmsClient = new AmazonKeyManagementServiceClient(RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION")));
+            var kmsClient = AwsClientFactory.CreateAmazonKeyManagementServiceClient();
             var decryptResponse = kmsClient.DecryptAsync(new DecryptRequest()
             {
                 CiphertextBlob = new MemoryStream(Convert.FromBase64String(Environment.GetEnvironmentVariable("DATA_ENCRYPTION_KEY")))
@@ -68,7 +65,6 @@ namespace BusinessEvents.SubscriptionEngine.Core.Security
             return result;
         }
 
-
         private static byte[] AES_EncryptDecrypt(byte[] inputBytes, ICryptoTransform createEncryptor)
         {
             byte[] decryptedBytes;
@@ -85,7 +81,6 @@ namespace BusinessEvents.SubscriptionEngine.Core.Security
 
             return decryptedBytes;
         }
-
 
         private static Aes AesCreator(string encryptionKey, byte[] saltBytes)
         {
