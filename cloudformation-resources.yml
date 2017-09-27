@@ -17,7 +17,7 @@ ProcessDashkinesisDashstreamLogGroup:
   Properties:
     RetentionInDays: "90"
 
-EventDashpostLogGroup:
+EventDashsnsDashpostLogGroup:
   Type: "AWS::Logs::LogGroup"
   Properties:
     RetentionInDays: "90"
@@ -27,7 +27,7 @@ EventDashgetLogGroup:
   Properties:
     RetentionInDays: "90"
 
-EventDashatomDashstreamLogGroup:
+EventsDashatomDashfeedLogGroup:
   Type: "AWS::Logs::LogGroup"
   Properties:
     RetentionInDays: "90"

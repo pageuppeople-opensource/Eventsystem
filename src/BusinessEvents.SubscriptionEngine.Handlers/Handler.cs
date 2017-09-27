@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.Model;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
-using Amazon.Kinesis;
 using Amazon.Kinesis.Model;
 using Amazon.Lambda.DynamoDBEvents;
 using Amazon.Lambda.KinesisEvents;
 using Amazon.Lambda.SNSEvents;
-using Amazon.Runtime.Internal;
 using Autofac;
 using BusinessEvents.SubscriptionEngine.Core;
 using BusinessEvents.SubscriptionEngine.Core.DataStore;
@@ -62,9 +57,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             };
         }
 
-        // You are in a bubble here. And this bubble will become big
-
-        public async Task<APIGatewayProxyResponse> PostEvent(APIGatewayProxyRequest request, ILambdaContext context)
+        public async Task<APIGatewayProxyResponse> EventSnsPost(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var logger = context.Logger;
             logger.Log(JsonConvert.SerializeObject(request));
@@ -126,7 +119,34 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             };
         }
 
-        public async Task<APIGatewayProxyResponse> GetEvent(APIGatewayProxyRequest request, ILambdaContext context)
+        public async Task EventSnsHandler(SNSEvent snsEvent, ILambdaContext context)
+        {
+            var logger = context.Logger;
+            logger.Log(JsonConvert.SerializeObject(snsEvent));
+
+            var kinesisClient = AwsClientFactory.CreateKinesisClient();
+
+            foreach (var record in snsEvent.Records)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    var b = Encoding.UTF8.GetBytes(record.Sns.Message);
+                    memoryStream.Write(b, 0, b.Length);
+                    memoryStream.Seek(0, SeekOrigin.Begin);
+
+                    var putRecordRequest = new PutRecordRequest
+                    {
+                        Data = memoryStream,
+                        PartitionKey = DateTime.UtcNow.ToString("yyyyMMddhhmmss"),
+                        StreamName = Environment.GetEnvironmentVariable("KINESIS_STREAM_NAME")
+                    };
+
+                    await kinesisClient.PutRecordAsync(putRecordRequest);
+                }
+            }
+        }
+
+        public async Task<APIGatewayProxyResponse> EventGet(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var logger = context.Logger;
             logger.Log(JsonConvert.SerializeObject(request));
@@ -144,13 +164,13 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             };
         }
 
-        public async Task<APIGatewayProxyResponse> AtomStreamEvents(APIGatewayProxyRequest request, ILambdaContext context)
+        public async Task<APIGatewayProxyResponse> EventsAtomFeed(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var logger = context.Logger;
             logger.Log(JsonConvert.SerializeObject(request));
 
             // stream is the event type
-            var stream = request.PathParameters.ContainsKey("stream") ? request.PathParameters["stream"] : throw new HttpRequestException("Bad Request");
+            var stream = request.PathParameters.ContainsKey("eventType") ? request.PathParameters["eventType"] : throw new HttpRequestException("Bad Request");
             // pointer can be a requestid, head, or last
             var pointer = request.PathParameters.ContainsKey("pointer") ? request.PathParameters["pointer"] : throw new HttpRequestException("Bad Request");
             // backward or forward
@@ -158,7 +178,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             var direction = request.PathParameters.ContainsKey("direction") ? request.PathParameters["direction"] : throw new HttpRequestException("Bad Request");
             // the size per page
             // todo: validate pagesize
-            var pageSize = request.PathParameters.ContainsKey("pagesize") ? request.PathParameters["pagesize"] : "20";
+            var pageSize = request.PathParameters.ContainsKey("pageSize") ? request.PathParameters["pageSize"] : "20";
 
 
             var feedService = Container.Resolve<IFeedService>();
