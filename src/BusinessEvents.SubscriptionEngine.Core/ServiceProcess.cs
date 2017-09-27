@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Amazon.Runtime;
 using Autofac.Features.Indexed;
 using BusinessEvents.SubscriptionEngine.Core.Notifiers;
 using PageUp.Events;
@@ -21,13 +22,13 @@ namespace BusinessEvents.SubscriptionEngine.Core
             this.notifierFactory = notifierFactory;
         }
         public async Task Process(Event @event)
-        {   
+        {
             var subscribers = await subscriptionsManager.GetSubscriptionsFor(@event?.Message?.Header?.MessageType);
             await NotifySubscribers(subscribers, @event);
         }
 
         private async Task<bool> NotifySubscribers(Subscription[] subscribers, Event @event)
-        {   
+        {
             var result = await Task.Factory.StartNew(() => Parallel.ForEach(subscribers, subscriber =>
             {
                 var notifier = notifierFactory[subscriber.Type];

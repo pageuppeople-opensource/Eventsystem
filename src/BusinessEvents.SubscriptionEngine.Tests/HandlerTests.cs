@@ -39,7 +39,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
             var handler = CreateHandler();
 
             //act
-            await handler.Handle(testSnsEvent);
+            //await handler.Handle(testSnsEvent);
 
             //assert
             await serviceProcess.ReceivedWithAnyArgs(2).Process(Arg.Any<Event>());
@@ -66,11 +66,11 @@ namespace BusinessEvents.SubscriptionEngine.Tests
 
             CreateMock<IServiceProcess>();
             var deadLetterService = CreateMock<IDeadLetterService>();
-            
+
             Handler handler = CreateHandler();
 
             //act
-            await handler.Handle(testSnsEvent);
+            //await handler.Handle(testSnsEvent);
 
             //assert
             await deadLetterService.ReceivedWithAnyArgs(1).Handle(Arg.Any<DeadLetterMessage>());
@@ -101,7 +101,7 @@ namespace BusinessEvents.SubscriptionEngine.Tests
             Handler handler = CreateHandler();
 
             //act
-            await handler.Handle(testSnsEvent);
+            //await handler.Handle(testSnsEvent);
 
             //assert
             await deadLetterService.ReceivedWithAnyArgs(1).Handle(Arg.Any<DeadLetterMessage>());

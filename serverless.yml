@@ -8,9 +8,12 @@ provider:
   stage: v1
   region: ap-southeast-2
   deploymentBucket: pageup-serverless-${opt:data-center}-deploy
+  environment:
+    DATA_CENTER: ${opt:data-center}
+    AUTH_ENDPOINT: ${self:custom.${opt:data-center}.AUTH_ENDPOINT}
+    DATA_ENCRYPTION_KEY: ${self:custom.${opt:data-center}.DATA_ENCRYPTION_KEY}
   iamRoleStatements:
     - Effect: "Allow"
-      Resource: "*"
       Action:
         - "sns:*"
         - "logs:CreateLogGroup"
@@ -22,45 +25,81 @@ provider:
         - "s3:GetObject"
         - "s3:CreateBucket"
         - "s3:PutBucket"
+      Resource: "*"
     - Effect: "Allow"
-      Resource: "arn:aws:lambda:*:*:function:integration*"
       Action:
         - "lambda:CreateAlias"
-        - "lambda:GetAccountSettings"
-        - "lambda:GetAlias"
-        - "lambda:GetEventSourceMapping"
-        - "lambda:GetFunction"
-        - "lambda:GetFunctionConfiguration"
-        - "lambda:GetPolicy"
-        - "lambda:InvokeAsync"
-        - "lambda:InvokeFunction"
-        - "lambda:ListAliases"
-        - "lambda:ListEventSourceMappings"
-        - "lambda:ListFunctions"
-        - "lambda:ListTags"
-        - "lambda:ListVersionsByFunction"
+        - "lambda:Get*"
+        - "lambda:Invoke*"
+        - "lambda:List*"
         - "lambda:PublishVersion"
         - "lambda:TagResource"
         - "lambda:UntagResource"
-        - "lambda:UpdateAlias"
-        - "lambda:UpdateEventSourceMapping"
-        - "lambda:UpdateFunctionCode"
-        - "lambda:UpdateFunctionConfiguration"
+        - "lambda:Update*"
+      Resource: "arn:aws:lambda:*:*:function:integration*"
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:*"
+      Resource:
+        - "arn:aws:dynamodb:*:*:table/BusinessEvent"
+        - "arn:aws:dynamodb:*:*:table/BusinessEvent/stream/*"
+        - "arn:aws:dynamodb:*:*:table/BusinessEvent/index/*"
+    - Effect: "Allow"
+      Action:
+        - "kinesis:*"
+      Resource:
+        Fn::GetAtt:
+          - BusinessEventStream
+          - Arn
 
 package:
   artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.0/publish/deploy-package.zip
 
 functions:
-  handle:
-    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::Handle
-    awsKmsKeyArn: ${self:custom.${opt:data-center}.KMS_KEY_ARN}
-    events:
-      - sns: BusinessEvents
+  process-dynamodb-stream:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessDynamoDbStream
     environment:
       AUTH_CLIENT_ID: ${self:custom.${opt:data-center}.AUTH_CLIENT_ID}
-      AUTH_ENDPOINT: ${self:custom.${opt:data-center}.AUTH_ENDPOINT}
       AUTH_CLIENT_SECRET: ${self:custom.${opt:data-center}.AUTH_CLIENT_SECRET}
-      DATA_CENTER: ${opt:data-center}
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+               - BusinessEventTable
+               - StreamArn
+          batchSize: 100
+          startingPosition: LATEST
+          enabled: true
+    tags:
+      stream: "Glofish"
+      service: ${self:service}
+
+  process-kinesis-stream:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessKinesisStream
+    events:
+      - stream:
+          type: kinesis
+          arn:
+            Fn::GetAtt:
+               - BusinessEventStream
+               - Arn
+          batchSize: 100
+          startingPosition: LATEST
+          enabled: true
+    tags:
+      stream: "Glofish"
+      service: ${self:service}
+
+  event-sns-handler:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventSnsHandler
+    environment:
+      KINESIS_STREAM_NAME:
+        Ref: "BusinessEventStream"
+    tags:
+      stream: "Glofish"
+      service: ${self:service}
+
   healthcheck:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::HealthCheck
     events:
@@ -68,3 +107,46 @@ functions:
           path: healthcheck
           method: get
           cors: true
+    tags:
+      stream: "Glofish"
+      service: ${self:service}
+
+#  event-sns-post:
+#    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventSnsPost
+#    events:
+#      - http:
+#          path: events/sns
+#          method: post
+#          cors: true
+#    environment:
+#      KINESIS_STREAM_NAME:
+#        Ref: "BusinessEventStream"
+#    tags:
+#      stream: "Glofish"
+#      service: ${self:service}
+#
+#
+#  event-get:
+#    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventGet
+#    events:
+#      - http:
+#          path: events/{messageId}
+#          method: get
+#          cors: true
+#    tags:
+#      stream: "Glofish"
+#      service: ${self:service}
+#
+#  events-atom-feed:
+#    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventsAtomFeed
+#    events:
+#      - http:
+#          path: events/atom/{eventType}/{pointer}/{direction}/{pageSize}
+#          method: get
+#          cors: true
+#    tags:
+#      stream: "Glofish"
+#      service: ${self:service}
+
+resources:
+  Resources: ${file(cloudformation-resources.yml)}

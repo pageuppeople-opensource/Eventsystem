@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		docker-compose.yml = docker-compose.yml
 		README.md = README.md
 		serverless.yml = serverless.yml
+		cloudformation-resources.yml = cloudformation-resources.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine.Core", "src\BusinessEvents.SubscriptionEngine.Core\BusinessEvents.SubscriptionEngine.Core.csproj", "{6D3F01AC-C0BD-42E6-B1F2-9A06278AD714}"
@@ -22,6 +23,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine.Handlers", "src\BusinessEvents.SubscriptionEngine.Handlers\BusinessEvents.SubscriptionEngine.Handlers.csproj", "{BE4152CC-55B1-4EA7-BF62-B56FB9066D40}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine.Tests", "src\BusinessEvents.SubscriptionEngine.Tests\BusinessEvents.SubscriptionEngine.Tests.csproj", "{D3C1B13D-6650-4208-B592-A0AF15CF8DB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadTestingConsole", "src\LoadTestingConsole\LoadTestingConsole.csproj", "{A9EE31F1-C038-4816-93EC-2120E07E4D35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +44,10 @@ Global
 		{D3C1B13D-6650-4208-B592-A0AF15CF8DB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3C1B13D-6650-4208-B592-A0AF15CF8DB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3C1B13D-6650-4208-B592-A0AF15CF8DB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9EE31F1-C038-4816-93EC-2120E07E4D35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9EE31F1-C038-4816-93EC-2120E07E4D35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9EE31F1-C038-4816-93EC-2120E07E4D35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9EE31F1-C038-4816-93EC-2120E07E4D35}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -49,5 +56,6 @@ Global
 		{6D3F01AC-C0BD-42E6-B1F2-9A06278AD714} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
 		{BE4152CC-55B1-4EA7-BF62-B56FB9066D40} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
 		{D3C1B13D-6650-4208-B592-A0AF15CF8DB2} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
+		{A9EE31F1-C038-4816-93EC-2120E07E4D35} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
 	EndGlobalSection
 EndGlobal
