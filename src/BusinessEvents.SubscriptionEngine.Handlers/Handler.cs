@@ -197,8 +197,6 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             };
         }
 
-        // You are in another bubble, and this bubble is to handle kinesis events
-
         public async Task ProcessKinesisStream(KinesisEvent kinesisEvent, ILambdaContext context)
         {
             var logger = context.Logger;
@@ -228,14 +226,6 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                         await MarkAsDeadLetter(message, jsonException);
                         continue;
                     }
-
-                    // todo: remove below
-                    logger.Log($"Raw Data: {JsonConvert.SerializeObject(@event)}");
-                    // todo: remove above
-
-                    logger.Log($"Encrypted Data: {JsonConvert.SerializeObject(@event).Encrypt()}");
-
-                    logger.Log($"Encrypted + Compression Data: {JsonConvert.SerializeObject(@event).Encrypt().ToCompressedBase64String()}");
 
                     try
                     {
@@ -267,9 +257,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
                 var recordImage = record.Dynamodb.NewImage;
                 @event = JsonConvert.DeserializeObject<Event>(recordImage["Data"].S.ToUncompressedString().Decrypt());
-                // todo: removed below
-                logger.Log(JsonConvert.SerializeObject(@event));
-                // todo: remove above
+
                 await serviceProcess.Process(@event);
             }
         }
