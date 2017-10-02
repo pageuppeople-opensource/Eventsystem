@@ -110,21 +110,6 @@ functions:
     tags:
       stream: "Glofish"
       service: ${self:service}
-
-#  event-sns-post:
-#    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventSnsPost
-#    events:
-#      - http:
-#          path: events/sns
-#          method: post
-#          cors: true
-#    environment:
-#      KINESIS_STREAM_NAME:
-#        Ref: "BusinessEventStream"
-#    tags:
-#      stream: "Glofish"
-#      service: ${self:service}
-#
 #
 #  event-get:
 #    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventGet
