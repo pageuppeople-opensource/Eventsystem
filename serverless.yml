@@ -72,8 +72,8 @@ functions:
           startingPosition: LATEST
           enabled: true
     tags:
-      stream: "Glofish"
-      service: ${self:service}
+      Stream: "Glofish"
+      Service: ${self:service}
 
   process-kinesis-stream:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessKinesisStream
@@ -88,8 +88,8 @@ functions:
           startingPosition: LATEST
           enabled: true
     tags:
-      stream: "Glofish"
-      service: ${self:service}
+      Stream: "Glofish"
+      Service: ${self:service}
 
   event-sns-handler:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventSnsHandler
@@ -97,8 +97,8 @@ functions:
       KINESIS_STREAM_NAME:
         Ref: "BusinessEventStream"
     tags:
-      stream: "Glofish"
-      service: ${self:service}
+      Stream: "Glofish"
+      Service: ${self:service}
 
   healthcheck:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::HealthCheck
@@ -108,8 +108,8 @@ functions:
           method: get
           cors: true
     tags:
-      stream: "Glofish"
-      service: ${self:service}
+      Stream: "Glofish"
+      Service: ${self:service}
 #
 #  event-get:
 #    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventGet
@@ -119,8 +119,8 @@ functions:
 #          method: get
 #          cors: true
 #    tags:
-#      stream: "Glofish"
-#      service: ${self:service}
+#      Stream: "Glofish"
+#      Service: ${self:service}
 #
 #  events-atom-feed:
 #    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventsAtomFeed
@@ -130,8 +130,8 @@ functions:
 #          method: get
 #          cors: true
 #    tags:
-#      stream: "Glofish"
-#      service: ${self:service}
+#      Stream: "Glofish"
+#      Service: ${self:service}
 
 resources:
   Resources: ${file(cloudformation-resources.yml)}
