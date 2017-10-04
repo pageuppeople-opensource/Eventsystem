@@ -40,11 +40,15 @@ namespace BusinessEvents.SubscriptionEngine.Core.DataStore
                 {
                     { ":messageId", new AttributeValue() { S = messageId }}
                 },
-                ExpressionAttributeNames =  new AutoConstructedDictionary<string, string>()
+            };
+
+            if (string.IsNullOrWhiteSpace(projectionExpression))
+            {
+                queryRequest.ExpressionAttributeNames = new Dictionary<string, string>()
                 {
                     {"#data", "Data"}
-                }
-            };
+                };
+            }
 
             var queryResponse = await dynamodbClient.QueryAsync(queryRequest);
 

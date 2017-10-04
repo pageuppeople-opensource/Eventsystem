@@ -51,6 +51,11 @@ provider:
         Fn::GetAtt:
           - BusinessEventStream
           - Arn
+    - Effect: "Allow"
+      Action:
+        - "xray:PutTelemetryRecords"
+        - "xray:PutTraceSegments"
+      Resource: "*"
 
 package:
   artifact: src/BusinessEvents.SubscriptionEngine.Handlers/bin/release/netcoreapp1.0/publish/deploy-package.zip
@@ -110,28 +115,40 @@ functions:
     tags:
       Stream: "Glofish"
       Service: ${self:service}
-#
-#  event-get:
-#    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventGet
-#    events:
-#      - http:
-#          path: events/{messageId}
-#          method: get
-#          cors: true
-#    tags:
-#      Stream: "Glofish"
-#      Service: ${self:service}
-#
-#  events-atom-feed:
-#    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventsAtomFeed
-#    events:
-#      - http:
-#          path: events/atom/{eventType}/{pointer}/{direction}/{pageSize}
-#          method: get
-#          cors: true
-#    tags:
-#      Stream: "Glofish"
-#      Service: ${self:service}
+
+  event-get:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventGet
+    events:
+      - http:
+          path: events/{messageId}
+          method: get
+          cors: true
+    tags:
+      Stream: "Glofish"
+      Service: ${self:service}
+
+  events-atom-feed:
+    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventsAtomFeed
+    events:
+      - http:
+          path: events/atom/{eventType}/{pointer}/{direction}/{pageSize}
+          method: get
+          cors: true
+      - http:
+          path: events/atom/{eventType}/{pointer}/{direction}
+          method: get
+          cors: true
+      - http:
+          path: events/atom/{eventType}/{pointer}
+          method: get
+          cors: true
+      - http:
+          path: events/atom/{eventType}/
+          method: get
+          cors: true
+    tags:
+      Stream: "Glofish"
+      Service: ${self:service}
 
 resources:
   Resources: ${file(cloudformation-resources.yml)}

@@ -15,13 +15,13 @@ namespace BusinessEvents.SubscriptionEngine.Core.FeedManagement
             _businessEventStore = businessEventStore;
         }
 
-        public async Task<string> CreateFeed(string stream, string pointer, string direction, string pageSize)
+        public async Task<string> CreateFeed(string stream, string pointer, string direction, int pageSize)
         {
             // todo: validate pointer, direction and pageSize
             var asc = (pointer == "last") || (direction == "forward");
-            var messageId = (pointer != "last" && pointer != "head") ? pointer : "";
+            var messageId = (pointer.ToLower() != "last" && pointer.ToLower() != "head") ? pointer : string.Empty;
 
-            var items = await _businessEventStore.QueryByMessageType(stream, Convert.ToInt32(pageSize), asc, messageId);
+            var items = await _businessEventStore.QueryByMessageType(stream, pageSize, asc, messageId);
 
             var feed = new Feed
             {

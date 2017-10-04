@@ -101,30 +101,67 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             };
         }
 
+        private static string TryGetDirection(IDictionary<string, string> pathParameters, string pointer)
+        {
+            if (!pathParameters.ContainsKey("direction"))
+            {
+                switch (pointer.ToLower())
+                {
+                    case "head":
+                        return "backward";
+                    case "last":
+                        return "forward";
+                    default:
+                        return "backward";
+                }
+            };
+
+            var direction = pathParameters["direction"];
+
+            var directionIsValid = !string.IsNullOrWhiteSpace(direction)
+                                   && (direction.Equals("forward", StringComparison.OrdinalIgnoreCase) ||
+                                       direction.Equals("backward", StringComparison.OrdinalIgnoreCase));
+
+            if (!directionIsValid) throw new HttpRequestException($"Unsupported parameter: {direction}.");
+
+            return direction;
+        }
+
+        private static int TryGetPageSize(IDictionary<string, string> pathParameters)
+        {
+            var pageSize = 20;
+
+            if (!pathParameters.ContainsKey("pageSize")) return pageSize;
+
+            var paramPageSize = pathParameters["pageSize"];
+
+            int.TryParse(paramPageSize, out pageSize);
+
+            return pageSize;
+        }
+
         public async Task<APIGatewayProxyResponse> EventsAtomFeed(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var logger = context.Logger;
             logger.Log(JsonConvert.SerializeObject(request));
 
-            // stream is the event type
-            var stream = request.PathParameters.ContainsKey("eventType") ? request.PathParameters["eventType"] : throw new HttpRequestException("Bad Request");
-            // pointer can be a requestid, head, or last
-            var pointer = request.PathParameters.ContainsKey("pointer") ? request.PathParameters["pointer"] : throw new HttpRequestException("Bad Request");
-            // backward or forward
-            // todo: validate direction
-            var direction = request.PathParameters.ContainsKey("direction") ? request.PathParameters["direction"] : throw new HttpRequestException("Bad Request");
-            // the size per page
-            // todo: validate pagesize
-            var pageSize = request.PathParameters.ContainsKey("pageSize") ? request.PathParameters["pageSize"] : "20";
+            var eventType = request.PathParameters.ContainsKey("eventType") ? request.PathParameters["eventType"] : throw new HttpRequestException("Required parameter missing. Event type is null");
 
+            // pointer can be a requestid, head, or last
+            var pointer = request.PathParameters.ContainsKey("pointer") ? request.PathParameters["pointer"] : "head";
+
+            var direction = TryGetDirection(request.PathParameters, pointer);
+
+            var pageSize = TryGetPageSize(request.PathParameters);
 
             var feedService = Container.Resolve<IFeedService>();
-            var feedResponse = await feedService.CreateFeed(stream, pointer, direction, pageSize);
+
+            logger.LogLine($"Request url: {request.Path}");
+            logger.LogLine($"Derived parameters: {eventType}, {pointer}, {direction}, {pageSize}");
+
+            var feedResponse = await feedService.CreateFeed(eventType, pointer, direction, pageSize);
 
             logger.Log(JsonConvert.SerializeObject(feedResponse));
-
-            // note that the response for N items may not be complete if the size of data to return exceeds the provisioned capacity
-            // so one or more queries are needed to get remaining number of items.
 
             return new APIGatewayProxyResponse()
             {
