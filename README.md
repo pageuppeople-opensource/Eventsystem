@@ -1,7 +1,15 @@
 # BusinessEvents.SubscriptionEngine.Bootstrap
 [![serverless](https://dl.dropboxusercontent.com/s/d6opqwym91k0roz/serverless_badge_v3.svg)](http://www.serverless.com)
 
-This is a serverless framework template project created for VS2017.
+This is a bootstrappable version of the BusinessEvents Subscription Engine used by Glofish. It is a serverless framework project using dotnet core 1.0 and C#.
+
+The project will create and deploy the following infrastructure:
+* Kinesis Stream
+* DynamoDB Table that stores all the events
+* Lambda functions
+* Api-Gateway
+
+Refer to [Business Events Management](https://pageuppeople.atlassian.net/wiki/spaces/DEV/pages/6816533/Business+Events+Management) document on Confluence for more information on the architecture design. 
 
 ## Installation
 
@@ -23,7 +31,7 @@ https://github.com/aspnet/Tooling/blob/master/known-issues-vs2015.md
 openssl aes-256-cbc -e -in serverless-environment-variables.yml -out serverless-environment-variables.yml.enc -k {$ENCRYPTION_KEY}
 ```
 
-Replace {$ENCRYPTION_KEY} with a value that is hard to guess and store it in your team's password repository.
+Replace {$ENCRYPTION_KEY} with a value that is hard to guess and store it in your team's password repository. Add the key value pair to the travis build environment variables.
 
 4. Setup the following build variables by running the following encryption commands with the appropriate values:
 
