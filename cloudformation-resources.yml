@@ -48,12 +48,12 @@ HealthcheckLogGroup:
 BusinessEventStream:
   Type: 'AWS::Kinesis::Stream'
   Properties:
-    Name: business-event-stream
+    Name: ${self:custom.prefix}-business-event-stream
     RetentionPeriodHours: 24
     ShardCount: 1
     Tags:
       - Key: Stream
-        Value: Glofish
+        Value: ${self:custom.stream}
       - Key: Service
         Value: ${self:service}
 
@@ -64,11 +64,11 @@ BusinessEventTable:
   Type: 'AWS::DynamoDB::Table'
   DeletionPolicy: Retain
   Properties:
-    TableName: BusinessEvent
+    TableName: ${self:custom.prefix}-BusinessEvent
     AttributeDefinitions:
       - AttributeName: MessageId
         AttributeType: S
-      - AttributeName: MessageType
+      - AttributeName: Domain
         AttributeType: S
       - AttributeName: PublishedTimeStampUtc
         AttributeType: S
@@ -78,25 +78,31 @@ BusinessEventTable:
       - AttributeName: PublishedTimeStampUtc
         KeyType: RANGE
     ProvisionedThroughput:
-      ReadCapacityUnits: 5
-      WriteCapacityUnits: 5
+      ReadCapacityUnits: 10
+      WriteCapacityUnits: 10
     StreamSpecification:
         StreamViewType: NEW_IMAGE
     GlobalSecondaryIndexes:
-      - IndexName: gidx_MessageType
+      - IndexName: gidx_Domain
         KeySchema:
-          - AttributeName: MessageType
+          - AttributeName: Domain
             KeyType: HASH
           - AttributeName: PublishedTimeStampUtc
             KeyType: RANGE
         Projection:
-          ProjectionType: KEYS_ONLY
+          NonKeyAttributes:
+            - CreatedTimeStampUtc
+            - MessageType
+            - CorrelationId
+            - AggregateId
+            - InstanceId
+          ProjectionType: INCLUDE
         ProvisionedThroughput:
-          ReadCapacityUnits: "5"
-          WriteCapacityUnits: "5"
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 10
     Tags:
         - Key: Stream
-          Value: Glofish
+          Value: ${self:custom.stream}
         - Key: Service
           Value: ${self:service}
 
@@ -135,7 +141,7 @@ ScalingRole:
 BusinessEventTableWriteCapacityScalableTarget:
   Type: "AWS::ApplicationAutoScaling::ScalableTarget"
   Properties:
-    MaxCapacity: 200
+    MaxCapacity: 240
     MinCapacity: 10
     ResourceId:
       Fn::Join:
@@ -158,8 +164,10 @@ BusinessEventTableWriteScalingPolicy:
     ScalingTargetId:
       Ref: BusinessEventTableWriteCapacityScalableTarget
     TargetTrackingScalingPolicyConfiguration:
-      TargetValue: 70.0
+      TargetValue: 50.0
+      # The amount of time, in seconds, after a scale in activity completes before another scale in activity can start.
       ScaleInCooldown: 60
+      # he amount of time, in seconds, after a scale out activity completes before another scale out activity can start.
       ScaleOutCooldown: 60
       PredefinedMetricSpecification:
         PredefinedMetricType: DynamoDBWriteCapacityUtilization
@@ -190,7 +198,7 @@ BusinessEventTableReadScalingPolicy:
     ScalingTargetId:
       Ref: BusinessEventTableReadCapacityScalableTarget
     TargetTrackingScalingPolicyConfiguration:
-      TargetValue: 70.0
+      TargetValue: 50.0
       ScaleInCooldown: 60
       ScaleOutCooldown: 60
       PredefinedMetricSpecification:
@@ -208,7 +216,7 @@ BusinessEventTableGlobalIndexMessageTypeReadCapacityScalableTarget:
           - Ref:
               BusinessEventTable
           - index
-          - gidx_MessageType
+          - gidx_Domain
     RoleARN:
       Fn::GetAtt:
          - ScalingRole
@@ -224,7 +232,7 @@ BusinessEventTableGlobalIndexMessageTypeReadScalingPolicy:
     ScalingTargetId:
       Ref: BusinessEventTableGlobalIndexMessageTypeReadCapacityScalableTarget
     TargetTrackingScalingPolicyConfiguration:
-      TargetValue: 70.0
+      TargetValue: 50.0
       ScaleInCooldown: 60
       ScaleOutCooldown: 60
       PredefinedMetricSpecification:
@@ -233,7 +241,7 @@ BusinessEventTableGlobalIndexMessageTypeReadScalingPolicy:
 BusinessEventTableGlobalIndexMessageTypeWriteCapacityScalableTarget:
   Type: "AWS::ApplicationAutoScaling::ScalableTarget"
   Properties:
-    MaxCapacity: 200
+    MaxCapacity: 120
     MinCapacity: 10
     ResourceId:
       Fn::Join:
@@ -242,7 +250,7 @@ BusinessEventTableGlobalIndexMessageTypeWriteCapacityScalableTarget:
           - Ref:
               BusinessEventTable
           - index
-          - gidx_MessageType
+          - gidx_Domain
     RoleARN:
       Fn::GetAtt:
          - ScalingRole
@@ -258,7 +266,7 @@ BusinessEventTableGlobalIndexMessageTypeWriteScalingPolicy:
     ScalingTargetId:
       Ref: BusinessEventTableGlobalIndexMessageTypeWriteCapacityScalableTarget
     TargetTrackingScalingPolicyConfiguration:
-      TargetValue: 70.0
+      TargetValue: 50.0
       ScaleInCooldown: 60
       ScaleOutCooldown: 60
       PredefinedMetricSpecification:

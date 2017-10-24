@@ -13,7 +13,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
 {
     public class S3SubscriptionsManagement
     {
-        private static readonly string BucketName = $"pageup-integration-{Environment.GetEnvironmentVariable("DATA_CENTER")?.ToLower() ?? "dc0"}";
+        private static readonly string BucketName = Environment.GetEnvironmentVariable("S3_BUCKET_NAME");
 
         private const string FileName = "subscription-management/subscriptions.json";
 
@@ -28,19 +28,13 @@ namespace BusinessEvents.SubscriptionEngine.Core
             {
                 try
                 {
-                    Console.WriteLine($"S3Subscription: Last modified date {lastModified}");
-
                     var modifiedAt = await GetLastModified(client);
-
-                    Console.WriteLine($"S3Subscription: S3 modified at {modifiedAt}");
 
                     if (modifiedAt > lastModified)
                     {
                         var content = await GetContent(client);
                         subscriptions = JsonConvert.DeserializeObject<List<Subscription>>(content);
-
                         lastModified = modifiedAt;
-                        Console.WriteLine($"S3Subscription: S3 content at first read {content}");
                     }
                 }
                 catch (AmazonS3Exception exception)
@@ -53,18 +47,14 @@ namespace BusinessEvents.SubscriptionEngine.Core
 
                     var content = await GetContent(client);
                     subscriptions = JsonConvert.DeserializeObject<List<Subscription>>(content);
-
-                    Console.WriteLine($"S3Subscription: S3 content after reading the bucket /item is {content}");
-
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine($"S3Subscription: Error received when ready s3 for subscriptions: {exception}");
+                    Console.WriteLine($"GetSubscription: Error: {exception}");
                 }
             }
 
-            Console.WriteLine($"S3Subscriptions: returning subsciptions {JsonConvert.SerializeObject(subscriptions)}");
-
+            Console.WriteLine($"GetSubscription: Found {subscriptions.Count} subscriptions");
             return subscriptions;
         }
 
@@ -105,7 +95,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             var createBucketRequest = new PutBucketRequest
             {
                 BucketName = BucketName,
-                BucketRegion = S3Region.APS2
+                BucketRegion = GetS3Region()
             };
 
             await client.PutBucketAsync(createBucketRequest);
@@ -158,6 +148,33 @@ namespace BusinessEvents.SubscriptionEngine.Core
                     return RegionEndpoint.APSoutheast1;
                 }
                 default: return RegionEndpoint.APSoutheast2;
+            }
+        }
+
+        private static S3Region GetS3Region()
+        {
+            switch(Environment.GetEnvironmentVariable("DATA_CENTER"))
+            {
+                case "dc0":
+                case "dc2":
+                {
+                    return S3Region.APS2;
+                }
+                case "dc3":
+                case "dc7":
+                {
+                    return S3Region.EU;
+                }
+                case "dc4":
+                {
+                    return S3Region.US;
+                }
+                case "dc5":
+                case "dc6":
+                {
+                    return S3Region.APS1;
+                }
+                default: return S3Region.APS2;;
             }
         }
     }

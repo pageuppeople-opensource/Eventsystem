@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using BusinessEvents.SubscriptionEngine.Core.DataStore;
 using BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement;
-using BusinessEvents.SubscriptionEngine.Core.FeedManagement;
 using BusinessEvents.SubscriptionEngine.Core.Notifiers;
 
 namespace BusinessEvents.SubscriptionEngine.Core
@@ -12,8 +11,8 @@ namespace BusinessEvents.SubscriptionEngine.Core
         {
             base.Load(builder);
             builder.RegisterType<BusinessEventStore>().As<IBusinessEventStore>().InstancePerDependency();
-            builder.RegisterType<AtomFeedService>().As<IFeedService>().InstancePerDependency();
 
+            builder.RegisterType<ServiceProcess>().As<IServiceProcess>().InstancePerDependency();
             builder.RegisterType<ServiceProcess>().As<IServiceProcess>().InstancePerDependency();
             builder.RegisterType<SubscriptionsManager>().As<ISubscriptionsManager>().SingleInstance();
             builder.RegisterType<AuthenticationModule>().As<IAuthenticationModule>().InstancePerDependency();

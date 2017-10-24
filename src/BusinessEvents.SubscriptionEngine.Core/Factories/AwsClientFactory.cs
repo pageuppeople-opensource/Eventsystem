@@ -10,7 +10,8 @@ namespace BusinessEvents.SubscriptionEngine.Core.Factories
     {
         public static AmazonDynamoDBClient CreateDynamoDbClient()
         {
-            return new AmazonDynamoDBClient(RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION")));
+            var client = new AmazonDynamoDBClient(RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION")));
+            return client;
         }
 
         public static AmazonKinesisClient CreateKinesisClient()

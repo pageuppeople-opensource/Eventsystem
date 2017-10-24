@@ -29,12 +29,12 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 
             try
             {
+                Console.WriteLine($"MessageId: {@event.Message.Header.MessageId} Event: {@event.Message.Header.MessageType} Subscriber: {subscriber.Type}:{subscriber.Endpoint}");
                 async Task<HttpResponseMessage> PostFunc((string scheme, string token) validToken)
                 {
                     var request = new HttpRequestMessage()
                     {
-                        Content = new StringContent(JsonConvert.SerializeObject(@event.Message), Encoding.UTF8,
-                            "application/json"),
+                        Content = new StringContent(JsonConvert.SerializeObject(@event.Message), Encoding.UTF8, "application/json"),
                         RequestUri = subscriber.Endpoint,
                         Method = HttpMethod.Post,
                         Headers =
@@ -64,6 +64,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
             catch (Exception exception)
             {
                 subscriberErrorService.RecordErrorForSubscriber(subscriber, @event, exception);
+                Console.WriteLine($"MessageId: {@event.Message.Header.MessageId} Subscriber: {subscriber.Type}:{subscriber.Endpoint} Error: {exception}");
                 throw;
             }
         }

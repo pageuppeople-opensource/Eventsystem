@@ -1,60 +1,74 @@
+custom:
+  stream: {PUT_STREAM_NAME_HERE}
+  s3BucketName: {PUT_S3_BUCKET_NAME_HERE}
+  prefix: {PUT_SERVICE_PREFIX_HERE}
+  vars: ${file(./serverless-environment-variables.yml)}
+
 service:
-  name: BusinessEvents-SubscriptionEngine
-  awsKmsKeyArn: ${self:custom.${opt:data-center}.KMS_KEY_ARN}
-custom: ${file(./serverless-environment-variables.yml)}
+  name: ${self:custom.prefix}-BusinessEventBus
+  awsKmsKeyArn: ${self:custom.vars.${opt:data-center}.KMS_KEY_ARN}
+
 provider:
   name: aws
   runtime: dotnetcore1.0
+  memorySize: 1024
+  timeout: 300
   stage: v1
   region: ap-southeast-2
   deploymentBucket: pageup-serverless-${opt:data-center}-deploy
+
   environment:
+    SERVICE: ${self:service}
+    PREFIX: ${self:custom.prefix}
+    STREAM: ${self:custom.stream}
+    S3_BUCKET_NAME: ${self:custom.s3BucketName}
     DATA_CENTER: ${opt:data-center}
-    AUTH_ENDPOINT: ${self:custom.${opt:data-center}.AUTH_ENDPOINT}
-    DATA_ENCRYPTION_KEY: ${self:custom.${opt:data-center}.DATA_ENCRYPTION_KEY}
+    AUTH_ENDPOINT: ${self:custom.vars.${opt:data-center}.AUTH_ENDPOINT}
+    DATA_ENCRYPTION_KEY: ${self:custom.vars.${opt:data-center}.DATA_ENCRYPTION_KEY}
+
   iamRoleStatements:
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "sns:*"
-        - "logs:CreateLogGroup"
-        - "logs:CreateLogStream"
-        - "logs:PutLogEvents"
-        - "logs:DescribeLogGroups"
-        - "logs:DescribeLogStreams"
-        - "s3:PutObject"
-        - "s3:GetObject"
-        - "s3:CreateBucket"
-        - "s3:PutBucket"
+        - sns:*
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+        - logs:DescribeLogGroups
+        - logs:DescribeLogStreams
+        - s3:PutObject
+        - s3:GetObject
+        - s3:CreateBucket
+        - s3:PutBucket
       Resource: "*"
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "lambda:CreateAlias"
-        - "lambda:Get*"
-        - "lambda:Invoke*"
-        - "lambda:List*"
-        - "lambda:PublishVersion"
-        - "lambda:TagResource"
-        - "lambda:UntagResource"
-        - "lambda:Update*"
-      Resource: "arn:aws:lambda:*:*:function:integration*"
-    - Effect: "Allow"
+        - lambda:CreateAlias
+        - lambda:Get*
+        - lambda:Invoke*
+        - lambda:List*
+        - lambda:PublishVersion
+        - lambda:TagResource
+        - lambda:UntagResource
+        - lambda:Update*
+      Resource: arn:aws:lambda:*:*:function:*
+    - Effect: Allow
       Action:
-        - "dynamodb:*"
+        - dynamodb:*
       Resource:
-        - "arn:aws:dynamodb:*:*:table/BusinessEvent"
-        - "arn:aws:dynamodb:*:*:table/BusinessEvent/stream/*"
-        - "arn:aws:dynamodb:*:*:table/BusinessEvent/index/*"
-    - Effect: "Allow"
+        - arn:aws:dynamodb:*:*:table/${self:custom.prefix}-BusinessEvent
+        - arn:aws:dynamodb:*:*:table/${self:custom.prefix}-BusinessEvent/stream/*
+        - arn:aws:dynamodb:*:*:table/${self:custom.prefix}-BusinessEvent/index/*
+    - Effect: Allow
       Action:
-        - "kinesis:*"
+        - kinesis:*
       Resource:
         Fn::GetAtt:
           - BusinessEventStream
           - Arn
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "xray:PutTelemetryRecords"
-        - "xray:PutTraceSegments"
+        - xray:PutTelemetryRecords
+        - xray:PutTraceSegments
       Resource: "*"
 
 package:
@@ -63,9 +77,10 @@ package:
 functions:
   process-dynamodb-stream:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessDynamoDbStream
+    memorySize: 1536
     environment:
-      AUTH_CLIENT_ID: ${self:custom.${opt:data-center}.AUTH_CLIENT_ID}
-      AUTH_CLIENT_SECRET: ${self:custom.${opt:data-center}.AUTH_CLIENT_SECRET}
+      AUTH_CLIENT_ID: ${self:custom.vars.${opt:data-center}.AUTH_CLIENT_ID}
+      AUTH_CLIENT_SECRET: ${self:custom.vars.${opt:data-center}.AUTH_CLIENT_SECRET}
     events:
       - stream:
           type: dynamodb
@@ -73,15 +88,16 @@ functions:
             Fn::GetAtt:
                - BusinessEventTable
                - StreamArn
-          batchSize: 100
+          batchSize: 280
           startingPosition: LATEST
           enabled: true
     tags:
-      Stream: "Glofish"
+      Stream: ${self:custom.stream}
       Service: ${self:service}
 
   process-kinesis-stream:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessKinesisStream
+    memorySize: 1536
     events:
       - stream:
           type: kinesis
@@ -89,11 +105,11 @@ functions:
             Fn::GetAtt:
                - BusinessEventStream
                - Arn
-          batchSize: 100
+          batchSize: 280
           startingPosition: LATEST
           enabled: true
     tags:
-      Stream: "Glofish"
+      Stream: ${self:custom.stream}
       Service: ${self:service}
 
   event-sns-handler:
@@ -102,7 +118,7 @@ functions:
       KINESIS_STREAM_NAME:
         Ref: "BusinessEventStream"
     tags:
-      Stream: "Glofish"
+      Stream: ${self:custom.stream}
       Service: ${self:service}
 
   healthcheck:
@@ -113,41 +129,7 @@ functions:
           method: get
           cors: true
     tags:
-      Stream: "Glofish"
-      Service: ${self:service}
-
-  event-get:
-    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventGet
-    events:
-      - http:
-          path: events/{messageId}
-          method: get
-          cors: true
-    tags:
-      Stream: "Glofish"
-      Service: ${self:service}
-
-  events-atom-feed:
-    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventsAtomFeed
-    events:
-      - http:
-          path: events/atom/{eventType}/{pointer}/{direction}/{pageSize}
-          method: get
-          cors: true
-      - http:
-          path: events/atom/{eventType}/{pointer}/{direction}
-          method: get
-          cors: true
-      - http:
-          path: events/atom/{eventType}/{pointer}
-          method: get
-          cors: true
-      - http:
-          path: events/atom/{eventType}/
-          method: get
-          cors: true
-    tags:
-      Stream: "Glofish"
+      Stream: ${self:custom.stream}
       Service: ${self:service}
 
 resources:

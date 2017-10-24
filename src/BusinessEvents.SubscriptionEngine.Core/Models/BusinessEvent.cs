@@ -6,7 +6,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Models
     {
         public string MessageId { get; set; }
         public string CorrelationId { get; set; }
-        public DateTime PublishedDateTimeUtc { get; set; }
+        public DateTime PublishedTimeStampUtc { get; set; }
         public DateTime CreatedTimeStampUtc { get; set; }
         public string MessageType { get; set; }
         public string Data { get; set; }

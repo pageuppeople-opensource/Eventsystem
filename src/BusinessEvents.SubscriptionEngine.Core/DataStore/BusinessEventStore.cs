@@ -16,14 +16,14 @@ namespace BusinessEvents.SubscriptionEngine.Core.DataStore
     public interface IBusinessEventStore
     {
         Task<List<Dictionary<string, AttributeValue>>> QueryByMessageId(string messageId, int limit, string projectionExpression = "");
-        Task<List<Dictionary<string, AttributeValue>>> QueryByMessageType(string eventType, int limit, bool asc, string startFromMessageId = "");
-        Task<List<Dictionary<string, AttributeValue>>> QueryByMessageType(string eventType, int limit, bool asc, Dictionary<string, AttributeValue> lastEvaluatedKey = null);
+        Task<List<Dictionary<string, AttributeValue>>> QueryByDomain(string domain, int limit, bool asc, string startFromMessageId = "");
+        Task<List<Dictionary<string, AttributeValue>>> QueryByDomain(string domain, int limit, bool asc, Dictionary<string, AttributeValue> lastEvaluatedKey = null);
         Task PutEvent(Event @event);
     }
 
     public class BusinessEventStore : IBusinessEventStore
     {
-        private const string TableName = "BusinessEvent";
+        private string TableName = $"{Environment.GetEnvironmentVariable("PREFIX")}-BusinessEvent";
 
         public async Task<List<Dictionary<string, AttributeValue>>> QueryByMessageId(string messageId, int limit, string projectionExpression = "")
         {
@@ -34,7 +34,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.DataStore
                 TableName = TableName,
                 ScanIndexForward = true,
                 Limit = limit,
-                ProjectionExpression = !string.IsNullOrWhiteSpace(projectionExpression) ? projectionExpression : "MessageId, CorrelationId, CreatedTimeStampUtc, PublishedTimeStampUtc, MessageType, #data",
+                ProjectionExpression = !string.IsNullOrWhiteSpace(projectionExpression) ? projectionExpression : "MessageId, CorrelationId, CreatedTimeStampUtc, PublishedTimeStampUtc, Domain, MessageType, #data",
                 KeyConditionExpression = "MessageId = :messageId",
                 ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
                 {
@@ -55,34 +55,34 @@ namespace BusinessEvents.SubscriptionEngine.Core.DataStore
             return queryResponse.Items;
         }
 
-        public async Task<List<Dictionary<string, AttributeValue>>> QueryByMessageType(string eventType, int limit, bool asc, string startFromMessageId = "")
+        public async Task<List<Dictionary<string, AttributeValue>>> QueryByDomain(string domain, int limit, bool asc, string startFromMessageId = "")
         {
             Dictionary<string, AttributeValue> lastEvaluatedKey = null;
 
             if (!string.IsNullOrWhiteSpace(startFromMessageId))
             {
-                var getStartKeyResponse = await QueryByMessageId(startFromMessageId, 1, "MessageId, PublishedTimeStampUtc, MessageType");
+                var getStartKeyResponse = await QueryByMessageId(startFromMessageId, 1, "MessageId, CreatedTimeStampUtc, PublishedTimeStampUtc, Domain, MessageType");
                 if (getStartKeyResponse.Any())
                    lastEvaluatedKey = getStartKeyResponse[0];
             }
 
-            return await QueryByMessageType(eventType, limit, asc, lastEvaluatedKey);
+            return await QueryByDomain(domain, limit, asc, lastEvaluatedKey);
         }
 
-        public async Task<List<Dictionary<string, AttributeValue>>> QueryByMessageType(string eventType, int limit, bool asc, Dictionary<string, AttributeValue> lastEvaluatedKey = null)
+        public async Task<List<Dictionary<string, AttributeValue>>> QueryByDomain(string domain, int limit, bool asc, Dictionary<string, AttributeValue> lastEvaluatedKey = null)
         {
             var queryRequest = new QueryRequest()
             {
                 TableName = TableName,
-                IndexName = "gidx_MessageType",
+                IndexName = "gidx_Domain",
                 Limit = limit,
                 ScanIndexForward = asc,
-                ProjectionExpression = "MessageId, PublishedTimeStampUtc, MessageType",
-                KeyConditionExpression = "MessageType = :messageType",
+                ProjectionExpression = "MessageId, CreatedTimeStampUtc, PublishedTimeStampUtc, Domain, MessageType",
+                KeyConditionExpression = "Domain = :domain",
                 ReturnConsumedCapacity = new ReturnConsumedCapacity("INDEXES"),
                 ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
                 {
-                    { ":messageType", new AttributeValue() { S = eventType }}
+                    { ":domain", new AttributeValue() { S = domain }}
                 }
             };
 
@@ -97,7 +97,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.DataStore
                 queryResponse.Items.Count < limit &&
                 queryResponse.LastEvaluatedKey != null && queryResponse.LastEvaluatedKey.Any())
             {
-                var moreResults = await QueryByMessageType(eventType, limit - queryResponse.Items.Count, asc, queryResponse.LastEvaluatedKey);
+                var moreResults = await QueryByDomain(domain, limit - queryResponse.Items.Count, asc, queryResponse.LastEvaluatedKey);
                 results.AddRange(moreResults);
             }
             else
@@ -113,11 +113,14 @@ namespace BusinessEvents.SubscriptionEngine.Core.DataStore
             var dynamodbClient = AwsClientFactory.CreateDynamoDbClient();
             var request = new PutItemRequest
             {
-                TableName = "BusinessEvent",
+                TableName = TableName,
                 Item = new Dictionary<string, AttributeValue>()
                 {
                     {
                         "MessageId", new AttributeValue {S = @event.Message.Header.MessageId}
+                    },
+                    {
+                        "InstanceId", new AttributeValue { S = @event.Header.InstanceId }
                     },
                     {
                         "CorrelationId", new AttributeValue {S = @event.Message.Header.CorrelationId}
@@ -129,6 +132,9 @@ namespace BusinessEvents.SubscriptionEngine.Core.DataStore
                         "CreatedTimeStampUtc", new AttributeValue { S = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture) }
                     },
                     {
+                        "Domain", new AttributeValue { S = GetDomain(@event) }
+                    },
+                    {
                         "MessageType", new AttributeValue { S = @event.Message.Header.MessageType }
                     },
                     {
@@ -138,6 +144,12 @@ namespace BusinessEvents.SubscriptionEngine.Core.DataStore
             };
 
             await dynamodbClient.PutItemAsync(request);
+        }
+
+        private static string GetDomain(Event @event)
+        {
+            var firstDashIndex = @event.Message.Header.MessageType.IndexOf("-", StringComparison.Ordinal);
+            return firstDashIndex >= 0 ? @event.Message.Header.MessageType.Substring(0, firstDashIndex) : @event.Message.Header.MessageType;
         }
     }
 }

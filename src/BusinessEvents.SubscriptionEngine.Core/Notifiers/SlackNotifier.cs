@@ -24,6 +24,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
 
             var payloadJson = JsonConvert.SerializeObject(slackText);
 
+            Console.WriteLine($"MessageId: {@event.Message.Header.MessageId} Event: {@event.Message.Header.MessageType} Subscriber: {subscriber.Type}:{subscriber.Endpoint}");
             using (var httpclient = new HttpClient())
             {
                 try
@@ -38,6 +39,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.Notifiers
                 catch (Exception exception)
                 {
                     subscriberErrorService.RecordErrorForSubscriber(subscriber, @event, exception);
+                    Console.WriteLine($"MessageId: {@event.Message.Header.MessageId} Event: {@event.Message.Header.MessageType} Error: {exception} End");
                     throw;
                 }
             }
