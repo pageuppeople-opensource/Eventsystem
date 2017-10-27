@@ -14,8 +14,8 @@ fi
 #deploy to DC0 on master branch
 if [ "$TRAVIS_BRANCH" = "master" ]; then
     echo "####### Development Deployment Starting"
-    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DEV
-    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DEV
+    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DC0
+    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DC0
     serverless deploy --stage v1 --region ap-southeast-2 --data-center dc0 -v
 fi
 

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,12 +36,6 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             Container = container;
         }
 
-        private async Task MarkAsDeadLetter(string message, JsonException jsonException = null)
-        {
-            var deadLetterService = Container.Resolve<IDeadLetterService>();
-            await deadLetterService.Handle(new DeadLetterMessage { Message = message, Exception = jsonException });
-        }
-
         public APIGatewayProxyResponse HealthCheck(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var logger = context.Logger;
@@ -63,7 +58,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
             logger.LogLine($"Items in SNS Event: {snsEvent.Records.Count}");
 
-            Parallel.ForEach(snsEvent.Records, (record) =>
+            foreach(var record in snsEvent.Records)
             {
                 try
                 {
@@ -91,7 +86,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                     logger.LogLine($"Kinesis Exception: {e}");
                     throw;
                 }
-            });
+            };
 
             Task.WaitAll(publishingTasks.ToArray());
         }
@@ -114,76 +109,66 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             };
         }
 
-        public void ProcessKinesisStream(KinesisEvent kinesisEvent, ILambdaContext context)
+        public async Task ProcessKinesisStream(KinesisEvent kinesisEvent, ILambdaContext context)
         {
-            var logger = context.Logger;
-            var businessEventStore = Container.Resolve<IBusinessEventStore>();
-            var tasks = new ConcurrentBag<Task>();
-
-            logger.Log($"# of items in kinesis event {kinesisEvent.Records.Count}");
             var kinesisWatch = System.Diagnostics.Stopwatch.StartNew();
 
-            Parallel.ForEach(kinesisEvent.Records, (record) =>
+            var logger = context.Logger;
+            logger.Log($"# of items in kinesis event {kinesisEvent.Records.Count}");
+
+            var businessEventStore = Container.Resolve<IBusinessEventStore>();
+
+            foreach(var record in kinesisEvent.Records)
             {
                 using (var sr = new StreamReader(record.Kinesis.Data))
                 {
                     var message = sr.ReadToEnd();
 
-                    Event @event;
+                    Event @event = null;
                     try
                     {
                         @event = JsonConvert.DeserializeObject<Event>(message);
 
                         if (@event?.Message == null)
                         {
-                            tasks.Add(MarkAsDeadLetter(message));
-                            logger.Log($"Invalid Message: {message}");
-                            return;
+                            await HandleDeadLetter(new Exception("Invalid Message in Event"), @event, context.FunctionName);
+                            logger.Log($"Error: Invalid Message: {JsonConvert.SerializeObject(@event)}");
+                            continue;
                         }
                     }
                     catch (JsonException jsonException)
                     {
-                        logger.Log($"Json Exception: {jsonException}");
-                        tasks.Add(MarkAsDeadLetter(message, jsonException));
-                        return;
+                        logger.Log($"Error: JsonConvert.DeserializeObject: {JsonConvert.SerializeObject(jsonException)}");
+                        await HandleDeadLetter(jsonException, @event, context.FunctionName);
+                        continue;
                     }
 
                     try
                     {
-                        var putEventTask = businessEventStore.PutEvent(@event);
-                        tasks.Add(putEventTask);
+                        await businessEventStore.PutEvent(@event);
                     }
                     catch (Exception e)
                     {
-                        logger.LogLine($"Error: Parallel.For: {e}");
+                        await HandleDeadLetter(e, @event, context.FunctionName);
+                        logger.LogLine($"Error: {JsonConvert.SerializeObject(e)}");
                     }
                 }
-            });
-
-            try
-            {
-                Task.WaitAll(tasks.ToArray());
-            }
-            catch (Exception e)
-            {
-                logger.LogLine($"Error: Task.WaitAll: {e}");
-            }
+            };
 
             kinesisWatch.Stop();
             logger.Log($"Kinesis Events Processed  {kinesisEvent.Records.Count} Time taken: {(kinesisWatch.ElapsedMilliseconds/1000)}secs");
         }
 
-        public void ProcessDynamoDbStream(DynamoDBEvent dynamoDbEvent, ILambdaContext context)
+        public async Task ProcessDynamoDbStream(DynamoDBEvent dynamoDbEvent, ILambdaContext context)
         {
-            var logger = context.Logger;
-            var serviceProcess = Container.Resolve<IServiceProcess>();
-            var tasks = new ConcurrentBag<Task>();
-
-            logger.Log($"# of items in dynamodb events {dynamoDbEvent.Records.Count}.");
-
             var dynamoWatch = System.Diagnostics.Stopwatch.StartNew();
 
-            Parallel.ForEach(dynamoDbEvent.Records, (record) =>
+            var logger = context.Logger;
+            logger.Log($"# of items in dynamodb events {dynamoDbEvent.Records.Count}.");
+
+            var serviceProcess = Container.Resolve<IServiceProcess>();
+
+            foreach(var record in dynamoDbEvent.Records)
             {
                 Event @event = null;
 
@@ -191,8 +176,9 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                 {
                     if (!record.Dynamodb.NewImage.ContainsKey("Data"))
                     {
-                        logger.Log("Skip");
-                        return;
+                        await HandleDeadLetter(new Exception("DynamoDB record contains no Data column"), null, context.FunctionName);
+                        logger.Log($"Error: DynamoDB record contains no Data column Record: {JsonConvert.SerializeObject(record.Dynamodb.NewImage)}");
+                        continue;
                     }
 
                     var recordImage = record.Dynamodb.NewImage;
@@ -200,26 +186,53 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
                     logger.Log($"{@event.Message.Header.MessageId} Event: {@event.Message.Header.MessageType}");
 
-                    var processTask = serviceProcess.Process(@event);
-                    tasks.Add(processTask);
+                    await serviceProcess.Process(@event);
                 }
                 catch (Exception e)
                 {
-                    logger.LogLine($"Error: Parallel.For: {e}");
+                    await HandleDeadLetter(e, @event, context.FunctionName);
+                    logger.LogLine($"Error: {e}");
                 }
-            });
-
-            try
-            {
-                Task.WaitAll(tasks.ToArray());
-            }
-            catch (Exception e)
-            {
-                logger.LogLine($"Error: Task.WaitAll: {e}");
-            }
+            };
 
             dynamoWatch.Stop();
             logger.Log($"Dynamo Events Processed  {dynamoDbEvent.Records.Count} Time taken: {(dynamoWatch.ElapsedMilliseconds/1000)}secs");
+        }
+
+        private async Task MarkAsDeadLetter(Event @event, string function, Exception exception = null)
+        {
+            var deadLetterService = Container.Resolve<IDeadLetterService>();
+            var message = JsonConvert.SerializeObject(@event);
+            await deadLetterService.Handle(new DeadLetterMessage
+            {
+                Function = function,
+                MessageId = @event?.Message?.Header?.MessageId,
+                PublishedTimeStampUtc = @event?.Header.TransportTimeStamp,
+                CreatedTimeStampUtc = DateTime.UtcNow,
+                Domain = BusinessEventStore.GetDomain(@event),
+                InstanceId = @event?.Header?.InstanceId,
+                MessageType = @event?.Message?.Header?.MessageType,
+                Message = message.Encrypt().ToCompressedBase64String(),
+                Exception = exception
+            });
+        }
+
+        private Task HandleTaskException(Task task, Event @event, string function)
+        {
+            Console.WriteLine($"Error: MessageId: {@event.Message?.Header?.MessageId} Function: {function} HandleTaskException: {JsonConvert.SerializeObject(task.Exception.InnerException)}");
+            return HandleDeadLetter(task.Exception.InnerException, @event, function);
+        }
+
+        private Task HandleDeadLetter(Exception exception, Event @event, string function)
+        {
+            var deadLetterTask = MarkAsDeadLetter(@event, function, exception);
+            deadLetterTask.ContinueWith(
+                t =>
+                {
+                    Console.WriteLine($"Error: MessageId: {@event?.Message?.Header.MessageId} MarkAsDeadLetter Failed: {JsonConvert.SerializeObject(t.Exception.InnerException)}");
+                }, TaskContinuationOptions.OnlyOnFaulted);
+
+            return deadLetterTask;
         }
 
         private static string TryGetDirection(IDictionary<string, string> pathParameters, string pointer)

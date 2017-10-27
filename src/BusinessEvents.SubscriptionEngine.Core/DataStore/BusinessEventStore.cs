@@ -146,7 +146,7 @@ namespace BusinessEvents.SubscriptionEngine.Core.DataStore
             await dynamodbClient.PutItemAsync(request);
         }
 
-        private static string GetDomain(Event @event)
+        public static string GetDomain(Event @event)
         {
             var firstDashIndex = @event.Message.Header.MessageType.IndexOf("-", StringComparison.Ordinal);
             return firstDashIndex >= 0 ? @event.Message.Header.MessageType.Substring(0, firstDashIndex) : @event.Message.Header.MessageType;
