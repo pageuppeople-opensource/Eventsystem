@@ -18,6 +18,7 @@ using BusinessEvents.SubscriptionEngine.Core.DataStore;
 using BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement;
 using BusinessEvents.SubscriptionEngine.Core.Extensions;
 using BusinessEvents.SubscriptionEngine.Core.Factories;
+using BusinessEvents.SubscriptionEngine.Core.Models;
 using Newtonsoft.Json;
 using PageUp.Events;
 using SnsMessage = Amazon.SimpleNotificationService.Util.Message;
@@ -111,7 +112,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
         public async Task ProcessKinesisStream(KinesisEvent kinesisEvent, ILambdaContext context)
         {
-            var kinesisWatch = System.Diagnostics.Stopwatch.StartNew();
+            var watch = System.Diagnostics.Stopwatch.StartNew();
 
             var logger = context.Logger;
             logger.Log($"# of items in kinesis event {kinesisEvent.Records.Count}");
@@ -131,7 +132,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
                         if (@event?.Message == null)
                         {
-                            await HandleDeadLetter(new Exception("Invalid Message in Event"), @event, context.FunctionName);
+                            await MarkAsDeadLetter(@event, context.FunctionName, new Exception("Invalid Message in Event"));
                             logger.Log($"Error: Invalid Message: {JsonConvert.SerializeObject(@event)}");
                             continue;
                         }
@@ -139,29 +140,38 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                     catch (JsonException jsonException)
                     {
                         logger.Log($"Error: JsonConvert.DeserializeObject: {JsonConvert.SerializeObject(jsonException)}");
-                        await HandleDeadLetter(jsonException, @event, context.FunctionName);
+                        await MarkAsDeadLetter(@event, context.FunctionName, jsonException);
                         continue;
                     }
 
                     try
                     {
+                        if (@event.Message.Header.Metadata != null && @event.Message.Header.Metadata.ContainsKey("OrderIndex") &&
+                            @event.Message.Header.Metadata != null && @event.Message.Header.Metadata.ContainsKey("BatchId") &&
+                            @event.Message.Header.Metadata != null && @event.Message.Header.Metadata.ContainsKey("Total"))
+                            logger.Log($"BatchId: {@event.Message.Header.Metadata["BatchId"]} Total: {@event.Message.Header.Metadata["Total"]} OrderIndex: {@event.Message.Header.Metadata["OrderIndex"]} MessageId: {@event.Message.Header.MessageId}");
+                        else
+                            logger.Log($"MessageId: {@event.Message.Header.MessageId}");
+
                         await businessEventStore.PutEvent(@event);
                     }
                     catch (Exception e)
                     {
-                        await HandleDeadLetter(e, @event, context.FunctionName);
+                        await MarkAsDeadLetter(@event, context.FunctionName, e);
                         logger.LogLine($"Error: {JsonConvert.SerializeObject(e)}");
                     }
                 }
             };
 
-            kinesisWatch.Stop();
-            logger.Log($"Kinesis Events Processed  {kinesisEvent.Records.Count} Time taken: {(kinesisWatch.ElapsedMilliseconds/1000)}secs");
+            watch.Stop();
+            logger.Log($"Kinesis Events Processed  {kinesisEvent.Records.Count} Time taken: {(watch.ElapsedMilliseconds/1000)} secs");
         }
 
         public async Task ProcessDynamoDbStream(DynamoDBEvent dynamoDbEvent, ILambdaContext context)
         {
-            var dynamoWatch = System.Diagnostics.Stopwatch.StartNew();
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
+            Environment.SetEnvironmentVariable("ACCOUNT_ID", HandlerHelper.GetAccountId(context.InvokedFunctionArn));
 
             var logger = context.Logger;
             logger.Log($"# of items in dynamodb events {dynamoDbEvent.Records.Count}.");
@@ -176,7 +186,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                 {
                     if (!record.Dynamodb.NewImage.ContainsKey("Data"))
                     {
-                        await HandleDeadLetter(new Exception("DynamoDB record contains no Data column"), null, context.FunctionName);
+                        await MarkAsDeadLetter(null, context.FunctionName, new Exception("DynamoDB record contains no Data column"));
                         logger.Log($"Error: DynamoDB record contains no Data column Record: {JsonConvert.SerializeObject(record.Dynamodb.NewImage)}");
                         continue;
                     }
@@ -184,26 +194,57 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                     var recordImage = record.Dynamodb.NewImage;
                     @event = JsonConvert.DeserializeObject<Event>(recordImage["Data"].S.ToUncompressedString().Decrypt());
 
-                    logger.Log($"{@event.Message.Header.MessageId} Event: {@event.Message.Header.MessageType}");
+                    if (@event.Message.Header.Metadata != null && @event.Message.Header.Metadata.ContainsKey("OrderIndex") &&
+                        @event.Message.Header.Metadata != null && @event.Message.Header.Metadata.ContainsKey("BatchId") &&
+                        @event.Message.Header.Metadata != null && @event.Message.Header.Metadata.ContainsKey("Total"))
+                        logger.Log($"BatchId: {@event.Message.Header.Metadata["BatchId"]} Total: {@event.Message.Header.Metadata["Total"]} OrderIndex: {@event.Message.Header.Metadata["OrderIndex"]} MessageId: {@event.Message.Header.MessageId} Event: {@event.Message.Header.MessageType}");
+                    else
+                        logger.Log($"{@event.Message.Header.MessageId} Event: {@event.Message.Header.MessageType}");
 
                     await serviceProcess.Process(@event);
                 }
                 catch (Exception e)
                 {
-                    await HandleDeadLetter(e, @event, context.FunctionName);
+                    await MarkAsDeadLetter(@event, context.FunctionName, e);
                     logger.LogLine($"Error: {e}");
                 }
             };
 
-            dynamoWatch.Stop();
-            logger.Log($"Dynamo Events Processed  {dynamoDbEvent.Records.Count} Time taken: {(dynamoWatch.ElapsedMilliseconds/1000)}secs");
+            watch.Stop();
+            logger.Log($"Dynamo Events Processed  {dynamoDbEvent.Records.Count} Time taken: {(watch.ElapsedMilliseconds/1000)} secs");
+        }
+
+        public async Task NotifySubscriber(LambdaInvocationPayload lambdaInvocationPayload, ILambdaContext context)
+        {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var logger = context.Logger;
+
+            logger.Log($"Lambda Event: {JsonConvert.SerializeObject(lambdaInvocationPayload)}");
+
+            Event @event = null;
+
+            try
+            {
+                @event = JsonConvert.DeserializeObject<Event>(lambdaInvocationPayload.EncryptedEvent.ToUncompressedString().Decrypt());
+                var serviceProcess = Container.Resolve<IServiceProcess>();
+                await serviceProcess.NotifySubscriber(lambdaInvocationPayload.Subscription, @event);
+            }
+            catch (Exception e)
+            {
+
+                await MarkAsDeadLetter(@event, context.FunctionName, e);
+                logger.LogLine($"Error: {e}");
+            }
+
+            watch.Stop();
+            logger.Log($"Events Processed  {lambdaInvocationPayload.Subscription.Type} MessageId: {@event?.Message?.Header?.MessageId} Time taken: {(watch.ElapsedMilliseconds/1000)} secs");
         }
 
         private async Task MarkAsDeadLetter(Event @event, string function, Exception exception = null)
         {
-            var deadLetterService = Container.Resolve<IDeadLetterService>();
             var message = JsonConvert.SerializeObject(@event);
-            await deadLetterService.Handle(new DeadLetterMessage
+
+            var deadLetter = new DeadLetterMessage
             {
                 Function = function,
                 MessageId = @event?.Message?.Header?.MessageId,
@@ -214,64 +255,18 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                 MessageType = @event?.Message?.Header?.MessageType,
                 Message = message.Encrypt().ToCompressedBase64String(),
                 Exception = exception
-            });
-        }
-
-        private Task HandleTaskException(Task task, Event @event, string function)
-        {
-            Console.WriteLine($"Error: MessageId: {@event.Message?.Header?.MessageId} Function: {function} HandleTaskException: {JsonConvert.SerializeObject(task.Exception.InnerException)}");
-            return HandleDeadLetter(task.Exception.InnerException, @event, function);
-        }
-
-        private Task HandleDeadLetter(Exception exception, Event @event, string function)
-        {
-            var deadLetterTask = MarkAsDeadLetter(@event, function, exception);
-            deadLetterTask.ContinueWith(
-                t =>
-                {
-                    Console.WriteLine($"Error: MessageId: {@event?.Message?.Header.MessageId} MarkAsDeadLetter Failed: {JsonConvert.SerializeObject(t.Exception.InnerException)}");
-                }, TaskContinuationOptions.OnlyOnFaulted);
-
-            return deadLetterTask;
-        }
-
-        private static string TryGetDirection(IDictionary<string, string> pathParameters, string pointer)
-        {
-            if (!pathParameters.ContainsKey("direction"))
-            {
-                switch (pointer.ToLower())
-                {
-                    case "head":
-                        return "backward";
-                    case "last":
-                        return "forward";
-                    default:
-                        return "backward";
-                }
             };
 
-            var direction = pathParameters["direction"];
-
-            var directionIsValid = !string.IsNullOrWhiteSpace(direction)
-                                   && (direction.Equals("forward", StringComparison.OrdinalIgnoreCase) ||
-                                       direction.Equals("backward", StringComparison.OrdinalIgnoreCase));
-
-            if (!directionIsValid) throw new HttpRequestException($"Unsupported parameter: {direction}.");
-
-            return direction;
-        }
-
-        private static int TryGetPageSize(IDictionary<string, string> pathParameters)
-        {
-            var pageSize = 20;
-
-            if (!pathParameters.ContainsKey("pageSize")) return pageSize;
-
-            var paramPageSize = pathParameters["pageSize"];
-
-            int.TryParse(paramPageSize, out pageSize);
-
-            return pageSize;
+            try
+            {
+                var deadLetterService = Container.Resolve<IDeadLetterService>();
+                await deadLetterService.Handle(deadLetter);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(
+                    $"Error: MessageId: {@event?.Message?.Header?.MessageId} MarkAsDeadLetter Failed: {JsonConvert.SerializeObject(e)} DeadLetter: {JsonConvert.SerializeObject(deadLetter)}");
+            }
         }
     }
 }

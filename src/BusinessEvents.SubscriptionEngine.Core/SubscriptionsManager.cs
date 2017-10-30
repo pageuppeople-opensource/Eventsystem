@@ -27,12 +27,6 @@ namespace BusinessEvents.SubscriptionEngine.Core
             {
                 new Subscription()
                 {
-                    Type = SubscriptionType.Slack,
-                    Endpoint = new Uri("https://hooks.slack.com/services/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"),
-                    BusinessEvent = "*"
-                },
-                new Subscription()
-                {
                     Type = SubscriptionType.Telemetry,
                     BusinessEvent = "*"
                 }

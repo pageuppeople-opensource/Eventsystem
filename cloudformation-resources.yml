@@ -37,6 +37,11 @@ EventsDashatomDashfeedLogGroup:
   Properties:
     RetentionInDays: "90"
 
+NotifyDashsubscriberLogGroup:
+  Type: "AWS::Logs::LogGroup"
+  Properties:
+    RetentionInDays: "90"
+
 HealthcheckLogGroup:
   Type: "AWS::Logs::LogGroup"
   Properties:

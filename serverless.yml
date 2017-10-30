@@ -55,6 +55,7 @@ provider:
       Action:
         - dynamodb:*
       Resource:
+        - arn:aws:dynamodb:*:*:table/BusinessEvent-Publishing-Meta
         - arn:aws:dynamodb:*:*:table/${self:custom.prefix}-BusinessEvent
         - arn:aws:dynamodb:*:*:table/${self:custom.prefix}-BusinessEvent/stream/*
         - arn:aws:dynamodb:*:*:table/${self:custom.prefix}-BusinessEvent/index/*
@@ -81,6 +82,7 @@ functions:
     environment:
       AUTH_CLIENT_ID: ${self:custom.vars.${opt:data-center}.AUTH_CLIENT_ID}
       AUTH_CLIENT_SECRET: ${self:custom.vars.${opt:data-center}.AUTH_CLIENT_SECRET}
+      NOTIFY_SUBSCRIBER_LAMBDA_NAME: ${self:service}-${opt:stage}-notify-subscriber
     events:
       - stream:
           type: dynamodb
@@ -120,6 +122,12 @@ functions:
     tags:
       Stream: ${self:custom.stream}
       Service: ${self:service}
+
+  notify-subscriber:
+      handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::NotifySubscriber
+      tags:
+        Stream: ${self:custom.stream}
+        Service: ${self:service}
 
   healthcheck:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::HealthCheck
