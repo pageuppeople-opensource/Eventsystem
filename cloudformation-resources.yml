@@ -42,6 +42,11 @@ NotifyDashsubscriberLogGroup:
   Properties:
     RetentionInDays: "90"
 
+HandleDashdlqLogGroup:
+  Type: "AWS::Logs::LogGroup"
+  Properties:
+    RetentionInDays: "90"
+
 HealthcheckLogGroup:
   Type: "AWS::Logs::LogGroup"
   Properties:
@@ -61,6 +66,50 @@ BusinessEventStream:
         Value: ${self:custom.stream}
       - Key: Service
         Value: ${self:service}
+
+BusinessEventDeadLetterQueue:
+  Type: "AWS::SQS::Queue"
+  Properties:
+    MessageRetentionPeriod: 604800 # 7 days
+    QueueName: ${self:custom.prefix}-BusinessEvent-DLQ
+    ReceiveMessageWaitTimeSeconds: 20 # 20 seconds
+    VisibilityTimeout: 120 # 2 minutes
+
+BusinessEventDeadLetterQueuePolicy:
+  Type: "AWS::SQS::QueuePolicy"
+  Properties:
+    PolicyDocument:
+      Version: "2012-10-17"
+      Statement:
+        -
+          Effect: "Allow"
+          Principal:
+            AWS:
+              - "047651431481"
+              - "342212725307"
+              - "356994454909"
+              - "824362207773"
+          Action:
+            - "sqs:SendMessage"
+          Resource:
+            - Fn::GetAtt:
+                - BusinessEventDeadLetterQueue
+                - Arn
+    Queues:
+      - Ref: BusinessEventDeadLetterQueue
+
+BusinessEventDeadLetterSnsTopic:
+  Type: "AWS::SNS::Topic"
+  Properties:
+    DisplayName: ${self:custom.prefix}-BusinessEvent-DLQ
+    TopicName: ${self:custom.prefix}-BusinessEvent-DLQ
+    Subscription:
+      -
+        Endpoint:
+          Fn::GetAtt:
+            - BusinessEventDeadLetterQueue
+            - Arn
+        Protocol: sqs
 
 ###
 # DynamoDB Table Business Events

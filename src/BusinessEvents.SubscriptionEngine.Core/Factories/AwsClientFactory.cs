@@ -3,6 +3,7 @@ using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.KeyManagementService;
 using Amazon.Kinesis;
+using Amazon.SQS;
 
 namespace BusinessEvents.SubscriptionEngine.Core.Factories
 {
@@ -22,6 +23,11 @@ namespace BusinessEvents.SubscriptionEngine.Core.Factories
         public static AmazonKeyManagementServiceClient CreateAmazonKeyManagementServiceClient()
         {
             return new AmazonKeyManagementServiceClient(RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION")));
+        }
+
+        public static AmazonSQSClient CreateAmazonSqsClient()
+        {
+            return new AmazonSQSClient(RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION")));
         }
     }
 }

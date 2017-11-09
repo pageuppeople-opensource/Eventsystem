@@ -25,6 +25,14 @@ provider:
     DATA_CENTER: ${opt:data-center}
     AUTH_ENDPOINT: ${self:custom.vars.${opt:data-center}.AUTH_ENDPOINT}
     DATA_ENCRYPTION_KEY: ${self:custom.vars.${opt:data-center}.DATA_ENCRYPTION_KEY}
+    DLQ:
+      Fn::GetAtt:
+        - BusinessEventDeadLetterQueue
+        - QueueName
+    DLQ_SNS_Topic:
+      Fn::GetAtt:
+        - BusinessEventDeadLetterSnsTopic
+        - TopicName
 
   iamRoleStatements:
     - Effect: Allow
@@ -65,6 +73,13 @@ provider:
       Resource:
         Fn::GetAtt:
           - BusinessEventStream
+          - Arn
+    - Effect: Allow
+      Action:
+        - sqs:*
+      Resource:
+        Fn::GetAtt:
+          - BusinessEventDeadLetterQueue
           - Arn
     - Effect: Allow
       Action:
@@ -128,6 +143,16 @@ functions:
       tags:
         Stream: ${self:custom.stream}
         Service: ${self:service}
+
+  handle-dlq:
+        handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::HandleDeadLetterQueue
+        events:
+          - schedule:
+              rate: rate(1 minute)
+              enabled: true
+        tags:
+          Stream: ${self:custom.stream}
+          Service: ${self:service}
 
   healthcheck:
     handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::HealthCheck

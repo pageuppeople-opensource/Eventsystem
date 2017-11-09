@@ -19,8 +19,10 @@ using BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement;
 using BusinessEvents.SubscriptionEngine.Core.Extensions;
 using BusinessEvents.SubscriptionEngine.Core.Factories;
 using BusinessEvents.SubscriptionEngine.Core.Models;
+using BusinessEvents.SubscriptionEngine.Core.QueueManagement;
 using Newtonsoft.Json;
 using PageUp.Events;
+using Message = Amazon.SQS.Model.Message;
 using SnsMessage = Amazon.SimpleNotificationService.Util.Message;
 
 namespace BusinessEvents.SubscriptionEngine.Handlers
@@ -238,6 +240,34 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
             watch.Stop();
             logger.Log($"Events Processed  {lambdaInvocationPayload.Subscription.Type} MessageId: {@event?.Message?.Header?.MessageId} Time taken: {(watch.ElapsedMilliseconds/1000)} secs");
+        }
+
+        public async Task HandleDeadLetterQueue(object cloudwatchEvent, ILambdaContext context)
+        {
+            try
+            {
+                var dlq = Container.ResolveKeyed<IQueue>("DLQ");
+                List<Message> messages;
+                do
+                {
+                    messages = await dlq.GetMessages();
+                    Console.WriteLine($"Processing {messages.Count} messages");
+                    foreach (var message in messages)
+                    {
+                        Console.WriteLine($"MessageId: {message.MessageId}, ReceiptHandle: {message.ReceiptHandle} Dead Letter Message: {message.Body}");
+                        var success = await dlq.DeleteMessage(message.ReceiptHandle);
+                        if (!success)
+                        {
+                            Console.WriteLine($"Unable to Delete Message From DLQ: ReceipeHandle: {message.ReceiptHandle}");
+                        }
+                    }
+                }
+                while (messages.Count > 0 && context.RemainingTime.TotalMilliseconds > 2000);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: Processing DLQ Error: {JsonConvert.SerializeObject(e)}");
+            }
         }
 
         private async Task MarkAsDeadLetter(Event @event, string function, Exception exception = null)

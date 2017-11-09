@@ -1,7 +1,9 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using BusinessEvents.SubscriptionEngine.Core.DataStore;
 using BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement;
 using BusinessEvents.SubscriptionEngine.Core.Notifiers;
+using BusinessEvents.SubscriptionEngine.Core.QueueManagement;
 
 namespace BusinessEvents.SubscriptionEngine.Core
 {
@@ -16,6 +18,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
             builder.RegisterType<ServiceProcess>().As<IServiceProcess>().InstancePerDependency();
             builder.RegisterType<SubscriptionsManager>().As<ISubscriptionsManager>().SingleInstance();
             builder.RegisterType<AuthenticationModule>().As<IAuthenticationModule>().InstancePerDependency();
+            builder.RegisterType<DeadLetterQueue>().WithParameter("queueName", Environment.GetEnvironmentVariable("DLQ")).Keyed<IQueue>("DLQ");
             builder.RegisterType<DeadLetterService>().As<IDeadLetterService>().InstancePerDependency();
             builder.RegisterType<SubscriberErrorService>().As<ISubscriberErrorService>().InstancePerDependency();
 
