@@ -140,6 +140,9 @@ functions:
 
   notify-subscriber:
       handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::NotifySubscriber
+      environment:
+        AUTH_CLIENT_ID: ${self:custom.vars.${opt:data-center}.AUTH_CLIENT_ID}
+        AUTH_CLIENT_SECRET: ${self:custom.vars.${opt:data-center}.AUTH_CLIENT_SECRET}
       tags:
         Stream: ${self:custom.stream}
         Service: ${self:service}
