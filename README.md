@@ -1,37 +1,113 @@
 # PageUp.EventSystem
-[![serverless](https://dl.dropboxusercontent.com/s/d6opqwym91k0roz/serverless_badge_v3.svg)](http://www.serverless.com)
-[![Build Status](https://travis-ci.com/PageUpPeopleOrg/PageUp.EventSystem.svg?token=dukFECyWinXromxHYFWE)](https://travis-ci.com/PageUpPeopleOrg/PageUp.EventSystem)
+[![serverless](https://dl.dropboxusercontent.com/s/d6opqwym91k0roz/serverless_badge_v3.svg)](http://www.serverless.com) [![Build Status](https://travis-ci.com/PageUpPeopleOrg/PageUp.EventSystem.svg?token=dukFECyWinXromxHYFWE)](https://travis-ci.com/PageUpPeopleOrg/PageUp.EventSystem)
 
-This is a bootstrappable version of the Business Events System. It is build using serverless framework, dotnet core 1.0 and C# targetting AWS.
+PageUp Event System - Enables applications and microservices to pass events between them reliably thereby enabling building decoupled domains and systems.
 
-The project will create and deploy the following infrastructure:
-* Kinesis Stream
-* DynamoDB Table that stores all the events
-* Lambda functions
-* Api-Gateway
+It provides support for two major consumer implementation types,
 
-## To get started 
+1. _Exactly once ordered processing_ for _worker role consumers_ 
+2. _Atleast once delivery through Webhooks (built in capability)_ for _Web role consumers_
 
-Make sure you have the [Serverless Framework](http://www.serverless.com) installed.
-```
-npm install serverless -g
-```
+Enabling developers to build [Event driven systems (Event Notification, Event Carried State Transer, Event Sourced)](https://martinfowler.com/articles/201701-event-driven.html)
 
-Install dotnetcore on your machine. If you encounter issues with VS2015, visit the following url to install the appropriate version of dotnetcore sdk.
-https://github.com/aspnet/Tooling/blob/master/known-issues-vs2015.md
+_This uses AWS tech, so requires to be deployed on AWS. However the consumers and producers are not limited to AWS platform._
+ 
 
-### Typical once off set up
+*The project is under heavy development. Some of the mentioned capabilities are not mature enough and may be a work in progress until we release a 1.0.0 version. It is worth starting the conversation through issues to register interest*
 
-1. Fill in the appropriate values in the file for the respective data centres.
-2. [Recommended] Encrypt the file using the following command
+## Contents
+
+* [Quick Start](#quick-start)
+* [Configuring the Subscription Engine (Webhook capability)](#configure-subscription-engine)
+* A Worker role sample
+* A Web role sample
+* Architecture
+* [Enable encryption of Data at rest](#encrypt-data-at-rest)
+* [How to encrypt sensitive deployment configurations](#encrypt-deployment-config)
+
+
+## <a name="quick-start"></a>Quick start
+
+Start by cloning this repo.
+
+### Prerequisite
+1. Install [Serverless Framework](http://www.serverless.com).
+    ```
+    npm install serverless -g
+    ```
+2. Install [dotnetcore](https://www.microsoft.com/net/download/)
+
+### Deploy
+
+1. Open `serverless.yml` and fill in the appropriate values under section `custom:`
+
+    For example
+    ```
+    custom:
+      stream: Glofish
+      s3BucketName: pageup-integration
+      prefix: Integration
+      vars: ${file(./serverless-environment-variables.yml)}
+    ```
+    
+    | Property      | Descriptionn  | 
+    | ------------- |:------------- |
+    | stream        | the stream name. this is used to tag the resources created by this serverless project |
+    | s3BucketName  | the S3 bucket where the subscriber file will be created and accessed from.            |
+    | prefix        | a unique identifier that is used to prefix the service name of serverless project     |
+    | vars          | the name of the environment variable file                                             |
+
+2. Deploy 
+
+    ```serverless deploy```
+
+## <a name="encrypt-data-at-rest"></a>Enable encryption of data at rest
+
+This system uses AWS Dynamo DB as the internal event store.
+If you require the data stored in this table to be encrypted, ensure to set up 
+`KMS_KEY_ARN` and `DATA_ENCRYPTION_KEY`.
+
+`KMS_KEY_ARN` - refers to the AWS KMS key to be used for encrypting
+`DATA_ENCRYPTION_KEY` - refers to the salt that goes along with encryption
+
+It is recommended to encrypt this file if it included in the repository.
+
+## <a name="configure-subscription-engine"></a>Configuring the Subscription Engine (Webhook capability)
+
+This is needed only if you are planning to use the Subscription engine capability to write consumers that are Web roles.
+To learn more about it, go to [web role sample](#web-role-sample)
+
+Subscription system supports
+1. Webhook consumers
+2. Authenticated Webhook consumers (oAuth client credentials grant flow)
+3. AWS Lambdas as consumers (uses ARN - requires IAM policies to invoke)
+
+
+### Subsciptions configuration    
+The configuration is webhooks are managed as a json file, the location of which is configured through ENV variable `S3_BUCKET_NAME`.
+A sample configuration file is included at the root called `subscriptions.json`.
+
+### oAuth configuration for subscriptions
+
+Current implementation of the Subscription engine supports only one Auth server, the credentials representing which are configured in `serverless-environment-variables.yml`
+
+## <a name="encrypt-deployment-config"></a>How to encrypt sensitive deployment configurations
+
+In the current set up, there are two potential places where sensitive information may end up.
+
+#### Serverless environment variables
+
+Encrypt this file using the following command
 
 ```
 openssl aes-256-cbc -e -in serverless-environment-variables.yml -out serverless-environment-variables.yml.enc -k {$ENCRYPTION_KEY}
 ```
+Replace {$ENCRYPTION_KEY} with a strong password. 
+Add the key value pair to the travis build environment variables.
 
-Replace {$ENCRYPTION_KEY} with a value that is hard to guess and store it in your team's password repository. Add the key value pair to the travis build environment variables.
+#### Travis yaml
 
-4. Setup the following build variables by running the following encryption commands with the appropriate values:
+Ensure any deployment credentials are encrypted.
 
 ```
 travis encrypt AWS_ACCESS_KEY_ID_STAGING="secretvalue"
@@ -42,26 +118,7 @@ travis encrypt AWS_SECRET_ACCESS_KEY_PRODUCTION="secretvalue"
 
 ```
 
-5. Open `serverless.yml` and fill in the appropriate values for your team under section `custom:`
-
-For example
-```
-custom:
-  stream: Glofish
-  s3BucketName: pageup-integration
-  prefix: Integration
-  vars: ${file(./serverless-environment-variables.yml)}
-```
-
-| Property      | Descriptionn  | 
-| ------------- |:------------- |
-| stream        | the stream name. this is used to tag the resources created by this serverless project |
-| s3BucketName  | the S3 bucket where the subscriber file will be created and accessed from.            |
-| prefix        | a unique identifier that is used to prefix the service name of serverless project     |
-| vars          | the name of the environment variable file                                             |
-
-
-## Developers - good to know
+## Developers section
 
 ### Build shortcuts
 
