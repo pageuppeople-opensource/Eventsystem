@@ -1,7 +1,8 @@
-# BusinessEvents.SubscriptionEngine.Bootstrap
+# PageUp.EventSystem
 [![serverless](https://dl.dropboxusercontent.com/s/d6opqwym91k0roz/serverless_badge_v3.svg)](http://www.serverless.com)
+[![Build Status](https://travis-ci.com/PageUpPeopleOrg/PageUp.EventSystem.svg?token=dukFECyWinXromxHYFWE)](https://travis-ci.com/PageUpPeopleOrg/PageUp.EventSystem)
 
-This is a bootstrappable version of the BusinessEvents Subscription Engine used by Glofish. It is a serverless framework project using dotnet core 1.0 and C#.
+This is a bootstrappable version of the Business Events System. It is build using serverless framework, dotnet core 1.0 and C# targetting AWS.
 
 The project will create and deploy the following infrastructure:
 * Kinesis Stream
@@ -9,9 +10,7 @@ The project will create and deploy the following infrastructure:
 * Lambda functions
 * Api-Gateway
 
-Refer to [Business Events Management](https://pageuppeople.atlassian.net/wiki/spaces/DEV/pages/6816533/Business+Events+Management) document on Confluence for more information on the architecture design. 
-
-## Installation
+## To get started 
 
 Make sure you have the [Serverless Framework](http://www.serverless.com) installed.
 ```
@@ -21,11 +20,10 @@ npm install serverless -g
 Install dotnetcore on your machine. If you encounter issues with VS2015, visit the following url to install the appropriate version of dotnetcore sdk.
 https://github.com/aspnet/Tooling/blob/master/known-issues-vs2015.md
 
-## Once Off Setup
+### Typical once off set up
 
-1. Rename `serverless-environment-variables-sample.yml` to `serverless-environment-variables.yml`
-2. Fill in the appropriate values in the file for the respective data centres.
-3. Encrypt the file using the following command
+1. Fill in the appropriate values in the file for the respective data centres.
+2. [Recommended] Encrypt the file using the following command
 
 ```
 openssl aes-256-cbc -e -in serverless-environment-variables.yml -out serverless-environment-variables.yml.enc -k {$ENCRYPTION_KEY}
@@ -36,17 +34,12 @@ Replace {$ENCRYPTION_KEY} with a value that is hard to guess and store it in you
 4. Setup the following build variables by running the following encryption commands with the appropriate values:
 
 ```
-travis encrypt AWS_ACCESS_KEY_ID_DC0="secretvalue"
-travis encrypt AWS_SECRET_ACCESS_KEY_DC0="secretvalue"
+travis encrypt AWS_ACCESS_KEY_ID_STAGING="secretvalue"
+travis encrypt AWS_SECRET_ACCESS_KEY_STAGING="secretvalue"
 
-travis encrypt AWS_ACCESS_KEY_ID_DC2_5="secretvalue"
-travis encrypt AWS_SECRET_ACCESS_KEY_DC2_5="secretvalue"
+travis encrypt AWS_ACCESS_KEY_ID_PRODUCTION="secretvalue"
+travis encrypt AWS_SECRET_ACCESS_KEY_PRODUCTION="secretvalue"
 
-travis encrypt AWS_ACCESS_KEY_ID_DC6="secretvalue"
-travis encrypt AWS_SECRET_ACCESS_KEY_DC6="secretvalue"
-
-travis encrypt AWS_ACCESS_KEY_ID_DC7="secretvalue"
-travis encrypt AWS_SECRET_ACCESS_KEY_DC7="secretvalue"
 ```
 
 5. Open `serverless.yml` and fill in the appropriate values for your team under section `custom:`
@@ -68,7 +61,9 @@ custom:
 | vars          | the name of the environment variable file                                             |
 
 
-## Build
+## Developers - good to know
+
+### Build shortcuts
 
 Run the following command in powershell to build the project.
 ```
@@ -80,7 +75,8 @@ Use the following command for bash.
 ./build.sh
 ```
 
-## Test
+### Test shortcuts
+
 To run unit tests
 
 Bring the docker container up. This will bring up local authentication server
@@ -93,9 +89,9 @@ Now run test
 dotnet test .\src\BusinessEvents.SubscriptionEngine.Tests\BusinessEvents.SubscriptionEngine.Tests.csproj
 ```
 
-## Deploy
+### Deployment from dev machine
 ```
-serverless deploy --stage v1 --region ap-southeast-2 --data-center dc0 -v
+serverless deploy --stage v1 --region ap-southeast-2 --data-center staging -v
 ```
 
 #### Deployment Quirks
@@ -112,5 +108,5 @@ The above functions require Kinesis and DynamoDB streams to be created first bef
 Once the streams are created, you do not have to peform this step again.
 
 
-
-
+### Internal reference 
+Refer to [Business Events Management](https://pageuppeople.atlassian.net/wiki/spaces/DEV/pages/6816533/Business+Events+Management) document on Confluence for more information on the architecture design. 
