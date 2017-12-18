@@ -1,42 +1,12 @@
-dc0:
+staging:
   AUTH_CLIENT_ID : "client_id"
   AUTH_CLIENT_SECRET : "client_secret"
-  AUTH_ENDPOINT : "http://login.dc0.pageuppeople.com/connect/token"
+  AUTH_ENDPOINT : "https://auth.staging.pageuppeople.com/connect/token"
   KMS_KEY_ARN : "kms_arn"
   DATA_ENCRYPTION_KEY : "encryption_key"
-dc2:
+production:
   AUTH_CLIENT_ID : "client_id"
   AUTH_CLIENT_SECRET : "client_secret"
-  AUTH_ENDPOINT : "http://login.dc2.pageuppeople.com/connect/token"
-  KMS_KEY_ARN : "kms_arn"
-  DATA_ENCRYPTION_KEY : "encryption_key"
-dc3:
-  AUTH_CLIENT_ID : "client_id"
-  AUTH_CLIENT_SECRET : "client_secret"
-  AUTH_ENDPOINT : "http://login.dc3.pageuppeople.com/connect/token"
-  KMS_KEY_ARN : "kms_arn"
-  DATA_ENCRYPTION_KEY : "encryption_key"
-dc4:
-  AUTH_CLIENT_ID : "client_id"
-  AUTH_CLIENT_SECRET : "client_secret"
-  AUTH_ENDPOINT : "http://login.dc4.pageuppeople.com/connect/token"
-  KMS_KEY_ARN : "kms_arn"
-  DATA_ENCRYPTION_KEY : "encryption_key"
-dc5:
-  AUTH_CLIENT_ID : "client_id"
-  AUTH_CLIENT_SECRET : "client_secret"
-  AUTH_ENDPOINT : "http://login.dc5.pageuppeople.com/connect/token"
-  KMS_KEY_ARN : "kms_arn"
-  DATA_ENCRYPTION_KEY : "encryption_key"
-dc6:
-  AUTH_CLIENT_ID : "client_id"
-  AUTH_CLIENT_SECRET : "client_secret"
-  AUTH_ENDPOINT : "http://login.dc6.pageuppeople.com/connect/token"
-  KMS_KEY_ARN : "kms_arn"
-  DATA_ENCRYPTION_KEY : "encryption_key"
-dc7:
-  AUTH_CLIENT_ID : "client_id"
-  AUTH_CLIENT_SECRET : "client_secret"
-  AUTH_ENDPOINT : "http://login.dc7.pageuppeople.com/connect/token"
+  AUTH_ENDPOINT : "https://auth.pageuppeople.com/connect/token"
   KMS_KEY_ARN : "kms_arn"
   DATA_ENCRYPTION_KEY : "encryption_key"
