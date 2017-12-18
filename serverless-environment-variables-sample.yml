@@ -29,13 +29,13 @@ dc5:
   KMS_KEY_ARN : "kms_arn"
   DATA_ENCRYPTION_KEY : "encryption_key"
 dc6:
-AUTH_CLIENT_ID : "client_id"
+  AUTH_CLIENT_ID : "client_id"
   AUTH_CLIENT_SECRET : "client_secret"
   AUTH_ENDPOINT : "http://login.dc6.pageuppeople.com/connect/token"
   KMS_KEY_ARN : "kms_arn"
   DATA_ENCRYPTION_KEY : "encryption_key"
 dc7:
-AUTH_CLIENT_ID : "client_id"
+  AUTH_CLIENT_ID : "client_id"
   AUTH_CLIENT_SECRET : "client_secret"
   AUTH_ENDPOINT : "http://login.dc7.pageuppeople.com/connect/token"
   KMS_KEY_ARN : "kms_arn"
