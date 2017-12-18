@@ -1,0 +1,12 @@
+staging:
+  AUTH_CLIENT_ID : "client_id"
+  AUTH_CLIENT_SECRET : "client_secret"
+  AUTH_ENDPOINT : "https://auth.staging.pageuppeople.com/connect/token"
+  KMS_KEY_ARN : "kms_arn"
+  DATA_ENCRYPTION_KEY : "encryption_key"
+production:
+  AUTH_CLIENT_ID : "client_id"
+  AUTH_CLIENT_SECRET : "client_secret"
+  AUTH_ENDPOINT : "https://auth.pageuppeople.com/connect/token"
+  KMS_KEY_ARN : "kms_arn"
+  DATA_ENCRYPTION_KEY : "encryption_key"
