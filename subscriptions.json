@@ -1,0 +1,20 @@
+[
+  {
+    Id: "1",
+    Type: "AuthenticatedWebhook",
+    Endpoint: "https://service1.pageuppeople.com/domain1/events",
+    BusinessEvent: "buinsess-event-a"
+  },
+  {
+    Id: "2",
+    Type: "Lambda",
+    LambdaArn: "arn:aws:lambda:ap-southeast-2:xxxxxx:function:service1-domain1-v1-endpointa",
+    BusinessEvent: "buinsess-event-b"
+  },
+  {
+    Id: "3",
+    Type: "Webhook",
+    Endpoint: "https://requestb.in/19swc1r1",
+    BusinessEvent: "buinsess-event-c"
+  }
+]
