@@ -4,7 +4,7 @@ mono: none
 dotnet: 1.0.4
 before_install:
 - openssl aes-256-cbc
-  -in serverless-environment-variables.yml.enc -out serverless-environment-variables.yml
+  -in serverless-environment-variables.yml.enc -out serverless-environment-variables-sample.yml
   -d
   -k $ENCRYPTION_KEY
 - sudo apt-get -qq update
