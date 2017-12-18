@@ -128,16 +128,7 @@ functions:
     tags:
       Stream: ${self:custom.stream}
       Service: ${self:service}
-
-  event-sns-handler:
-    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::EventSnsHandler
-    environment:
-      KINESIS_STREAM_NAME:
-        Ref: "BusinessEventStream"
-    tags:
-      Stream: ${self:custom.stream}
-      Service: ${self:service}
-
+  
   notify-subscriber:
       handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::NotifySubscriber
       environment:
@@ -156,17 +147,6 @@ functions:
         tags:
           Stream: ${self:custom.stream}
           Service: ${self:service}
-
-  healthcheck:
-    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::HealthCheck
-    events:
-      - http:
-          path: healthcheck
-          method: get
-          cors: true
-    tags:
-      Stream: ${self:custom.stream}
-      Service: ${self:service}
 
 resources:
   Resources: ${file(cloudformation-resources.yml)}
