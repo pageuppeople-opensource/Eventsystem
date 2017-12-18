@@ -13,39 +13,24 @@ fi
 
 #deploy to DC0 on master branch
 if [ "$TRAVIS_BRANCH" = "master" ]; then
-    echo "####### Development Deployment Starting"
-    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DC0
-    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DC0
-    serverless deploy --stage v1 --region ap-southeast-2 --data-center dc0 -v
+    echo "####### Staging Deployment Starting"
+    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_STAGING
+    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_STAGING
+    serverless deploy --stage v1 --region ap-southeast-2 --data-center staging -v
 fi
 
 if [ "$TRAVIS_BRANCH" = "prod" ]; then
     ## Create the keys for production
     echo "####### Production Deployment Starting"
-    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DC2_5
-    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DC2_5
-
-    echo "####### Deploying DC2"
-    serverless deploy --stage v1 --region ap-southeast-2 --data-center dc2 -v
-
-    echo "####### Deploying DC3"
-    serverless deploy --stage v1 --region eu-west-1 --data-center dc3 -v
-
-    echo "####### Deploying DC4"
-    serverless deploy --stage v1 --region us-east-1 --data-center dc4 -v
-
-    echo "####### Deploying DC5"
-    serverless deploy --stage v1 --region ap-southeast-1 --data-center dc5 -v
-
-    echo "####### Deploying DC6"
-    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DC6
-    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DC6
-    serverless deploy --stage v1 --region ap-southeast-1 --data-center dc6 -v
-
-    echo "####### Deploying DC7"
-    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DC7
-    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DC7
-    serverless deploy --stage v1 --region eu-west-1 --data-center dc7 -v
+    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_PRODUCTION
+    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_PRODUCTION
+    serverless deploy --stage v1 --region ap-southeast-2 --data-center production -v
+    
+    ## You can add more environments different different accounts or region like below
+    ## echo "####### Deploying US DC"
+    ## export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_US_DC
+    ## export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_US_DC
+    ## serverless deploy --stage v1 --region eu-west-1 --data-center us_dc -v
 
     git tag $VERSION
     git push origin --tags
