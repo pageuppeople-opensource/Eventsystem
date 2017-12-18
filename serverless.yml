@@ -2,7 +2,7 @@ custom:
   stream: {PUT_STREAM_NAME_HERE}
   s3BucketName: {PUT_S3_BUCKET_NAME_HERE}
   prefix: {PUT_SERVICE_PREFIX_HERE}
-  vars: ${file(./serverless-environment-variables-sample.yml)}
+  vars: ${file(./serverless-environment-variables.yml)}
 
 service:
   name: ${self:custom.prefix}-BusinessEventBus
