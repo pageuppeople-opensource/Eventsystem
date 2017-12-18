@@ -39,61 +39,6 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             Container = container;
         }
 
-        public APIGatewayProxyResponse HealthCheck(APIGatewayProxyRequest request, ILambdaContext context)
-        {
-            var logger = context.Logger;
-            logger.LogLine(context.FunctionName);
-            logger.LogLine(request.HttpMethod);
-
-            return new APIGatewayProxyResponse()
-            {
-                StatusCode = 200,
-                Headers = new Dictionary<string, string>() { {"Context-Type", "text/html"} },
-                Body = "OK"
-            };
-        }
-
-        public void EventSnsHandler(SNSEvent snsEvent, ILambdaContext context)
-        {
-            var logger = context.Logger;
-            var kinesisClient = AwsClientFactory.CreateKinesisClient();
-            var publishingTasks = new ConcurrentBag<Task<PutRecordResponse>>();
-
-            logger.LogLine($"Items in SNS Event: {snsEvent.Records.Count}");
-
-            foreach(var record in snsEvent.Records)
-            {
-                try
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        var @event = JsonConvert.DeserializeObject<Event>(record.Sns.Message);
-                        var b = Encoding.UTF8.GetBytes(record.Sns.Message);
-                        memoryStream.Write(b, 0, b.Length);
-                        memoryStream.Seek(0, SeekOrigin.Begin);
-
-                        var putRecordRequest = new PutRecordRequest
-                        {
-                            Data = memoryStream,
-                            PartitionKey = @event.Message.Header.MessageType,
-                            StreamName = Environment.GetEnvironmentVariable("KINESIS_STREAM_NAME")
-                        };
-
-                        var publishedTask = kinesisClient.PutRecordAsync(putRecordRequest);
-                        publishingTasks.Add(publishedTask);
-                        logger.LogLine($"SNS Event MessageId: {@event.Message.Header.MessageId}");
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.LogLine($"Kinesis Exception: {e}");
-                    throw;
-                }
-            };
-
-            Task.WaitAll(publishingTasks.ToArray());
-        }
-
         public async Task<APIGatewayProxyResponse> EventGet(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var logger = context.Logger;
