@@ -1,7 +1,7 @@
 # EventSystem
 [![serverless](https://dl.dropboxusercontent.com/s/d6opqwym91k0roz/serverless_badge_v3.svg)](http://www.serverless.com) [![Build Status](https://travis-ci.com/PageUpPeopleOrg/PageUp.EventSystem.svg?token=dukFECyWinXromxHYFWE)](https://travis-ci.com/PageUpPeopleOrg/PageUp.EventSystem)
 
-PageUp Event System - Enables applications and microservices to pass events between them reliably thereby enabling building decoupled domains and systems.
+Event System - Enables applications and microservices to pass events between them reliably thereby enabling building decoupled domains and systems.
 
 It provides support for two major consumer implementation types,
 
