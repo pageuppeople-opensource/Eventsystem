@@ -11,9 +11,10 @@ It provides support for two major consumer implementation types,
 Enabling developers to build [Event driven systems (Event Notification, Event Carried State Transer, Event Sourced)](https://martinfowler.com/articles/201701-event-driven.html)
 
 _This uses AWS tech, so requires to be deployed on AWS. However the consumers and producers are not limited to AWS platform._
- 
 
-*The project is under heavy development. Some of the mentioned capabilities are not mature enough and may be a work in progress until we release a 1.0.0 version. It is worth starting the conversation through issues to register interest*
+*The project is under development. Some of the mentioned capabilities are not mature enough and may be a work in progress until we release a 1.0.0 version. It is worth starting the conversation through issues to register interest*
+
+*PageUp does have few other alternate implementaitons. This repo does not mean, this is the primary Event bus in use within PageUp*
 
 ## Contents
 
