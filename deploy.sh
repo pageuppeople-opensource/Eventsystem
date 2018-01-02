@@ -25,7 +25,7 @@ if [ "$TRAVIS_BRANCH" = "prod" ]; then
     export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_PRODUCTION}
     export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_PRODUCTION}
     serverless deploy --stage v1 --region ap-southeast-2 --data-center production -v
-    
+
     ## You can add more environments different different accounts or region like below
     ## echo "####### Deploying US DC"
     ## export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_US_DC
@@ -36,7 +36,3 @@ if [ "$TRAVIS_BRANCH" = "prod" ]; then
     git push origin --tags
     exit 0
 fi
-
-
-
-
