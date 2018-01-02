@@ -39,8 +39,8 @@ namespace BusinessEvents.SubscriptionEngine.Notifiers
                     { "client_id", auth.ClientId },
                     { "client_secret", auth.ClientSecret },
                     { "grant_type", "client_credentials" },
-                    { "scope", "Private.SubscriptionEngine.Notify" },
-                    { "instanceId", $"{instanceId}" }
+                    { "scope", "Subscription.Notify" },
+                    { "instanceid", $"{instanceId}" }
                 })
             };
 
