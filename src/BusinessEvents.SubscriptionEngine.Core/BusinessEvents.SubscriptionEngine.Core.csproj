@@ -1,13 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyTitle>BusinessEvents.SubscriptionEngine.Core</AssemblyTitle>
     <TargetFramework>netstandard1.6</TargetFramework>
     <AssemblyName>BusinessEvents.SubscriptionEngine.Core</AssemblyName>
     <RootNamespace>BusinessEvents.SubscriptionEngine.Core</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.6.1" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BusinessEvents.DataStream\BusinessEvents.DataStream.csproj" />
     <ProjectReference Include="..\..\BusinessEvents.EventStore\BusinessEvents.EventStore.csproj" />
@@ -17,4 +15,5 @@
   <ItemGroup>
     <Folder Include="Models\" />
   </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

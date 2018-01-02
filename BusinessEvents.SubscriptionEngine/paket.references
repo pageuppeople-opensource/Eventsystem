@@ -1,0 +1,7 @@
+PageUp.Events
+Autofac
+AWSSDK.Lambda
+Newtonsoft.Json
+System.ValueTuple
+PageUp.Telemetry
+AWSSDK.S3
