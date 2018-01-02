@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{45DD4D50-C020-4D24-9A8D-F175EA637932}"
 	ProjectSection(SolutionItems) = preProject
 		paket.dependencies = paket.dependencies
+		paket.lock = paket.lock
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}"
@@ -35,15 +36,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.Subscription
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.EventStream", "src\BusinessEvents.EventStream\BusinessEvents.EventStream.csproj", "{FE41088A-698A-4271-AF60-77321D8ED06E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.EventStore", "BusinessEvents.EventStore\BusinessEvents.EventStore.csproj", "{5D26F559-5369-4E28-8F16-9837B1ADB248}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.EventStore", "BusinessEvents.EventStore\BusinessEvents.EventStore.csproj", "{5D26F559-5369-4E28-8F16-9837B1ADB248}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.AwsFactories", "BusinessEvents.AwsFactories\BusinessEvents.AwsFactories.csproj", "{144496C4-9133-4DF7-91F1-AE313C2DF47F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.AwsFactories", "BusinessEvents.AwsFactories\BusinessEvents.AwsFactories.csproj", "{144496C4-9133-4DF7-91F1-AE313C2DF47F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.DeadLetter", "BusinessEvents.DeadLetter\BusinessEvents.DeadLetter.csproj", "{02BBEA5B-1F8E-4334-A717-25F5374C97DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.DeadLetter", "BusinessEvents.DeadLetter\BusinessEvents.DeadLetter.csproj", "{02BBEA5B-1F8E-4334-A717-25F5374C97DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.DataStream", "BusinessEvents.DataStream\BusinessEvents.DataStream.csproj", "{E1D15634-9559-47A4-AA71-6A8373878E5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.DataStream", "BusinessEvents.DataStream\BusinessEvents.DataStream.csproj", "{E1D15634-9559-47A4-AA71-6A8373878E5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.SubscriptionEngine", "BusinessEvents.SubscriptionEngine\BusinessEvents.SubscriptionEngine.csproj", "{788223AE-DF60-46A6-AC46-1F8EE305FCFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine", "BusinessEvents.SubscriptionEngine\BusinessEvents.SubscriptionEngine.csproj", "{788223AE-DF60-46A6-AC46-1F8EE305FCFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
