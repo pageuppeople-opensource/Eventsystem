@@ -7,20 +7,14 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.1" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.4" />
-    <PackageReference Include="AWSSDK.Lambda" Version="3.3.8" />
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.4" />
-    <PackageReference Include="AWSSDK.KeyManagementService" Version="3.3.3" />
-    <PackageReference Include="AWSSDK.Kinesis" Version="3.3.3" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.0.23" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.3.2" />
-    <PackageReference Include="cloudscribe.Syndication" Version="1.1.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="PageUp.Events" Version="0.0.5" />
-    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
-    <PackageReference Include="NSubstitute" Version="2.0.3" />
-    <PackageReference Include="PageUp.Telemetry" Version="1.2.6" />
-    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.3.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BusinessEvents.DataStream\BusinessEvents.DataStream.csproj" />
+    <ProjectReference Include="..\..\BusinessEvents.EventStore\BusinessEvents.EventStore.csproj" />
+    <ProjectReference Include="..\..\BusinessEvents.SubscriptionEngine\BusinessEvents.SubscriptionEngine.csproj" />
+    <ProjectReference Include="..\BusinessEvents.EventStream\BusinessEvents.EventStream.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
 </Project>

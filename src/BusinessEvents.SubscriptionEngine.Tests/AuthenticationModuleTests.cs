@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
-using BusinessEvents.SubscriptionEngine.Core;
-using BusinessEvents.SubscriptionEngine.Core.Notifiers;
+using BusinessEvents.SubscriptionEngine.Notifiers;
 using Castle.Core.Internal;
 using Xunit;
 

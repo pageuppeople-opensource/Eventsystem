@@ -14,27 +14,17 @@
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.DynamoDBEvents" Version="1.0.1" />
     <PackageReference Include="Amazon.Lambda.KinesisEvents" Version="1.0.1" />
-    <PackageReference Include="Amazon.Lambda.Logging.AspNetCore" Version="1.1.0" />
-    <PackageReference Include="Amazon.Lambda.SNSEvents" Version="1.0.0" />
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.4.17" />
-    <PackageReference Include="AWSSDK.KeyManagementService" Version="3.3.3.1" />
-    <PackageReference Include="AWSSDK.Kinesis" Version="3.3.3" />
-    <PackageReference Include="AWSSDK.Lambda" Version="3.3.8" />
     <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0*" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.1.0" />
     <PackageReference Include="Amazon.Lambda.Tools" Version="1.6.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="1.1.0" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.0.23" />
     <PackageReference Include="PageUp.Events" Version="0.0.5" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\BusinessEvents.DataStream\BusinessEvents.DataStream.csproj" />
+    <ProjectReference Include="..\BusinessEvents.EventStream\BusinessEvents.EventStream.csproj" />
     <ProjectReference Include="..\BusinessEvents.SubscriptionEngine.Core\BusinessEvents.SubscriptionEngine.Core.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Configuration\dev.ap-southeast-2.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 </Project>

@@ -1,6 +1,5 @@
 ﻿using System;
-using BusinessEvents.SubscriptionEngine.Core;
-using BusinessEvents.SubscriptionEngine.Core.Notifiers;
+using BusinessEvents.SubscriptionEngine.Notifiers;
 using PageUp.Events;
 using Xunit;
 

@@ -1,24 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D4D35B5-177A-439F-AAAA-AF29F41BD49B}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		.npmignore = .npmignore
 		.travis.yml = .travis.yml
 		authlocal\Data\auth-data.json = authlocal\Data\auth-data.json
 		build.ps1 = build.ps1
 		build.sh = build.sh
+		cloudformation-resources.yml = cloudformation-resources.yml
 		deploy.sh = deploy.sh
 		docker-compose.yml = docker-compose.yml
 		README.md = README.md
-		serverless.yml = serverless.yml
-		cloudformation-resources.yml = cloudformation-resources.yml
 		serverless-environment-variables.yml = serverless-environment-variables.yml
-		.gitignore = .gitignore
-		.npmignore = .npmignore
+		serverless.yml = serverless.yml
 		subscriptions.json = subscriptions.json
 	EndProjectSection
 EndProject
@@ -28,7 +28,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.Subscription
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine.Tests", "src\BusinessEvents.SubscriptionEngine.Tests\BusinessEvents.SubscriptionEngine.Tests.csproj", "{D3C1B13D-6650-4208-B592-A0AF15CF8DB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.EventStream", "src\BusinessEvents.EventStream\BusinessEvents.EventStream.csproj", "{FE41088A-698A-4271-AF60-77321D8ED06E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.EventStream", "src\BusinessEvents.EventStream\BusinessEvents.EventStream.csproj", "{FE41088A-698A-4271-AF60-77321D8ED06E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.EventStore", "BusinessEvents.EventStore\BusinessEvents.EventStore.csproj", "{5D26F559-5369-4E28-8F16-9837B1ADB248}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.AwsFactories", "BusinessEvents.AwsFactories\BusinessEvents.AwsFactories.csproj", "{144496C4-9133-4DF7-91F1-AE313C2DF47F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.DeadLetter", "BusinessEvents.DeadLetter\BusinessEvents.DeadLetter.csproj", "{02BBEA5B-1F8E-4334-A717-25F5374C97DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.DataStream", "BusinessEvents.DataStream\BusinessEvents.DataStream.csproj", "{E1D15634-9559-47A4-AA71-6A8373878E5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEvents.SubscriptionEngine", "BusinessEvents.SubscriptionEngine\BusinessEvents.SubscriptionEngine.csproj", "{788223AE-DF60-46A6-AC46-1F8EE305FCFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,6 +62,26 @@ Global
 		{FE41088A-698A-4271-AF60-77321D8ED06E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE41088A-698A-4271-AF60-77321D8ED06E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE41088A-698A-4271-AF60-77321D8ED06E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D26F559-5369-4E28-8F16-9837B1ADB248}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D26F559-5369-4E28-8F16-9837B1ADB248}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D26F559-5369-4E28-8F16-9837B1ADB248}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D26F559-5369-4E28-8F16-9837B1ADB248}.Release|Any CPU.Build.0 = Release|Any CPU
+		{144496C4-9133-4DF7-91F1-AE313C2DF47F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{144496C4-9133-4DF7-91F1-AE313C2DF47F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{144496C4-9133-4DF7-91F1-AE313C2DF47F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{144496C4-9133-4DF7-91F1-AE313C2DF47F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02BBEA5B-1F8E-4334-A717-25F5374C97DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02BBEA5B-1F8E-4334-A717-25F5374C97DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02BBEA5B-1F8E-4334-A717-25F5374C97DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02BBEA5B-1F8E-4334-A717-25F5374C97DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1D15634-9559-47A4-AA71-6A8373878E5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1D15634-9559-47A4-AA71-6A8373878E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1D15634-9559-47A4-AA71-6A8373878E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1D15634-9559-47A4-AA71-6A8373878E5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{788223AE-DF60-46A6-AC46-1F8EE305FCFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{788223AE-DF60-46A6-AC46-1F8EE305FCFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{788223AE-DF60-46A6-AC46-1F8EE305FCFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{788223AE-DF60-46A6-AC46-1F8EE305FCFA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,5 +91,13 @@ Global
 		{BE4152CC-55B1-4EA7-BF62-B56FB9066D40} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
 		{D3C1B13D-6650-4208-B592-A0AF15CF8DB2} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
 		{FE41088A-698A-4271-AF60-77321D8ED06E} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
+		{5D26F559-5369-4E28-8F16-9837B1ADB248} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
+		{144496C4-9133-4DF7-91F1-AE313C2DF47F} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
+		{02BBEA5B-1F8E-4334-A717-25F5374C97DC} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
+		{E1D15634-9559-47A4-AA71-6A8373878E5C} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
+		{788223AE-DF60-46A6-AC46-1F8EE305FCFA} = {75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7FFF69E0-5C05-4F91-B019-2D9BC479530D}
 	EndGlobalSection
 EndGlobal
