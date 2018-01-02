@@ -1,0 +1,6 @@
+Microsoft.NET.Test.Sdk
+NSubstitute
+xunit.runner.visualstudio
+System.Runtime.Serialization.Primitives
+xunit
+Amazon.Lambda.TestUtilities

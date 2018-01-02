@@ -1,0 +1,22 @@
+source https://api.nuget.org/v3/index.json
+
+nuget Amazon.Lambda.APIGatewayEvents 1.1.0
+nuget Amazon.Lambda.Core >= 1.0.00
+nuget Amazon.Lambda.DynamoDBEvents 1.0.1
+nuget Amazon.Lambda.KinesisEvents 1.0.1
+nuget Amazon.Lambda.Serialization.Json 1.1.0
+nuget Amazon.Lambda.TestUtilities 1.0.0
+nuget Autofac 4.6.1
+nuget AWSSDK.DynamoDBv2 3.3.4.3
+nuget AWSSDK.Lambda 3.3.8
+nuget AWSSDK.S3 3.3.4
+nuget AWSSDK.SimpleNotificationService 3.3.0.23
+nuget Microsoft.NET.Test.Sdk 15.0.0
+nuget Newtonsoft.Json 10.0.3
+nuget NSubstitute 2.0.3
+nuget PageUp.Events 0.0.5
+nuget PageUp.Telemetry 1.2.6
+nuget System.Runtime.Serialization.Primitives 4.3.0
+nuget System.ValueTuple 4.3.1
+nuget xunit 2.2.0
+nuget xunit.runner.visualstudio 2.2.0

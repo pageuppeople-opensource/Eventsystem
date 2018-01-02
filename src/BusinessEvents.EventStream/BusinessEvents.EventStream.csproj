@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyTitle>BusinessEvents.EventStream</AssemblyTitle>
     <TargetFramework>netstandard1.6</TargetFramework>
@@ -9,7 +10,5 @@
     <ProjectReference Include="..\..\BusinessEvents.DeadLetter\BusinessEvents.DeadLetter.csproj" />
     <ProjectReference Include="..\..\BusinessEvents.EventStore\BusinessEvents.EventStore.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Amazon.Lambda.KinesisEvents" Version="1.0.1" />
-  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
