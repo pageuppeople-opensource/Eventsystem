@@ -22,7 +22,6 @@ _This uses AWS tech, so requires to be deployed on AWS. However the consumers an
 * A Worker role sample
 * A Web role sample
 * Architecture
-* [Enable encryption of Data at rest](#encrypt-data-at-rest)
 * [How to encrypt sensitive deployment configurations](#encrypt-deployment-config)
 
 
@@ -60,17 +59,6 @@ Start by cloning this repo.
 2. Deploy 
 
     ```serverless deploy```
-
-## <a name="encrypt-data-at-rest"></a>Enable encryption of data at rest
-
-This system uses AWS Dynamo DB as the internal event store.
-If you require the data stored in this table to be encrypted, ensure to set up 
-`KMS_KEY_ARN` and `DATA_ENCRYPTION_KEY`.
-
-`KMS_KEY_ARN` - refers to the AWS KMS key to be used for encrypting
-`DATA_ENCRYPTION_KEY` - refers to the salt that goes along with encryption
-
-It is recommended to encrypt this file if it included in the repository.
 
 ## <a name="configure-subscription-engine"></a>Configuring the Subscription Engine (Webhook capability)
 
@@ -163,7 +151,3 @@ And you may have to run `serverless deploy ...` twice to successfully deploy the
 
 The above functions require Kinesis and DynamoDB streams to be created first before it can attach itself to the streams.
 Once the streams are created, you do not have to peform this step again.
-
-
-### Internal reference 
-Refer to [Business Events Management](https://pageuppeople.atlassian.net/wiki/spaces/DEV/pages/6816533/Business+Events+Management) document on Confluence for more information on the architecture design. 
