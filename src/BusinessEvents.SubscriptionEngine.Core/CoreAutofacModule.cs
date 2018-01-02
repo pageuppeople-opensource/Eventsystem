@@ -1,9 +1,9 @@
-﻿using System;
-using Autofac;
-using BusinessEvents.SubscriptionEngine.Core.DataStore;
-using BusinessEvents.SubscriptionEngine.Core.DeadLetterManagement;
-using BusinessEvents.SubscriptionEngine.Core.Notifiers;
-using BusinessEvents.SubscriptionEngine.Core.QueueManagement;
+﻿using Autofac;
+using BusinessEvents.DataStream;
+using BusinessEvents.EventStore;
+using BusinessEvents.EventStream;
+using BusinessEvents.SubscriptionEngine.Notifiers;
+using BusinessEvents.DeadLetter;
 
 namespace BusinessEvents.SubscriptionEngine.Core
 {
@@ -12,15 +12,18 @@ namespace BusinessEvents.SubscriptionEngine.Core
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
+            builder.RegisterType<EventStreamProcessor>().As<IEventStreamProcessor>().InstancePerDependency();
             builder.RegisterType<BusinessEventStore>().As<IBusinessEventStore>().InstancePerDependency();
-
-            builder.RegisterType<ServiceProcess>().As<IServiceProcess>().InstancePerDependency();
-            builder.RegisterType<ServiceProcess>().As<IServiceProcess>().InstancePerDependency();
-            builder.RegisterType<SubscriptionsManager>().As<ISubscriptionsManager>().SingleInstance();
-            builder.RegisterType<AuthenticationModule>().As<IAuthenticationModule>().InstancePerDependency();
-            builder.RegisterType<DeadLetterQueue>().WithParameter("queueName", Environment.GetEnvironmentVariable("DLQ")).Keyed<IQueue>("DLQ");
             builder.RegisterType<DeadLetterService>().As<IDeadLetterService>().InstancePerDependency();
+
+            // Subscription engine dependencies
+            builder.RegisterType<DataStreamProcessor>().As<IDataStreamProcessor>().InstancePerDependency();
+
+            builder.RegisterType<SubscriptionProcessor>().As<ISubscriptionProcessor>().InstancePerDependency();
+            builder.RegisterType<SubscriptionsManager>().As<ISubscriptionsManager>().SingleInstance();
             builder.RegisterType<SubscriberErrorService>().As<ISubscriberErrorService>().InstancePerDependency();
+           
+            builder.RegisterType<AuthenticationModule>().As<IAuthenticationModule>().InstancePerDependency();
 
             builder.RegisterType<TelemetryNotifier>().Keyed<INotifier>(SubscriptionType.Telemetry);
             builder.RegisterType<SlackNotifier>().Keyed<INotifier>(SubscriptionType.Slack);

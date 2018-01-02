@@ -7,8 +7,8 @@ namespace BusinessEvents.SubscriptionEngine.Tests
         [Fact]
         public void StoresIncomingEvents()
         {
-            // arrange
-            var handler = 
+//            // arrange
+//            var handler = 
         }
     }
 }
