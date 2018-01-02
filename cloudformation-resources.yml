@@ -67,12 +67,6 @@ BusinessEventStream:
       - Key: Service
         Value: ${self:service}
 
-BusinessEventDeadLetterSnsTopic:
-  Type: "AWS::SNS::Topic"
-  Properties:
-    DisplayName: ${self:custom.prefix}-BusinessEvent-DLQ
-    TopicName: ${self:custom.prefix}-BusinessEvent-DLQ    
-
 ###
 # DynamoDB Table Business Events
 ###
