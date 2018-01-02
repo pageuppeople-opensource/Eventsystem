@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyTitle>BusinessEvents.SubscriptionEngine.Handlers</AssemblyTitle>
     <TargetFramework>netcoreapp1.0</TargetFramework>
@@ -13,14 +12,19 @@
     <RootNamespace>BusinessEvents.SubscriptionEngine.Handlers</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.DynamoDBEvents" Version="1.0.1" />
+    <PackageReference Include="Amazon.Lambda.KinesisEvents" Version="1.0.1" />
+    <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0*" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.1.0" />
     <PackageReference Include="Amazon.Lambda.Tools" Version="1.6.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="1.1.0" />
+    <PackageReference Include="PageUp.Events" Version="0.0.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BusinessEvents.DataStream\BusinessEvents.DataStream.csproj" />
     <ProjectReference Include="..\BusinessEvents.EventStream\BusinessEvents.EventStream.csproj" />
     <ProjectReference Include="..\BusinessEvents.SubscriptionEngine.Core\BusinessEvents.SubscriptionEngine.Core.csproj" />
   </ItemGroup>
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

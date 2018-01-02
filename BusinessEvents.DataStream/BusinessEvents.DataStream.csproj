@@ -1,12 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.DynamoDBEvents" Version="1.0.1" />
+    <PackageReference Include="PageUp.Events" Version="0.0.5" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BusinessEvents.DeadLetter\BusinessEvents.DeadLetter.csproj" />
     <ProjectReference Include="..\BusinessEvents.EventStore\BusinessEvents.EventStore.csproj" />
     <ProjectReference Include="..\BusinessEvents.SubscriptionEngine\BusinessEvents.SubscriptionEngine.csproj" />
   </ItemGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
