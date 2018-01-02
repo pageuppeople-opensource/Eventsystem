@@ -13,7 +13,7 @@ namespace BusinessEvents.SubscriptionEngine.Core
 {
     public class S3SubscriptionsManagement
     {
-        private static readonly string BucketName = Environment.GetEnvironmentVariable("S3_BUCKET_NAME");
+        private static readonly string BucketName = Environment.GetEnvironmentVariable("SUBSCRIPTION_CONFIG_BUCKET");
 
         private const string FileName = "subscription-management/subscriptions.json";
 

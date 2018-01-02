@@ -138,7 +138,9 @@ namespace BusinessEvents.SubscriptionEngine.Core.DataStore
                         "MessageType", new AttributeValue { S = @event.Message.Header.MessageType }
                     },
                     {
-                        "Data", new AttributeValue {S = JsonConvert.SerializeObject(@event).Encrypt().ToCompressedBase64String() }
+                        "Data", new AttributeValue {S = JsonConvert.SerializeObject(@event)
+//                            .Encrypt().ToCompressedBase64String() 
+                        }
                     }
                 }
             };

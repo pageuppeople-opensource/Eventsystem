@@ -139,7 +139,8 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                     }
 
                     var recordImage = record.Dynamodb.NewImage;
-                    @event = JsonConvert.DeserializeObject<Event>(recordImage["Data"].S.ToUncompressedString().Decrypt());
+                    @event = JsonConvert.DeserializeObject<Event>(recordImage["Data"].S.ToUncompressedString());
+//                        .Decrypt());
 
                     if (@event.Message.Header.Metadata != null && @event.Message.Header.Metadata.ContainsKey("OrderIndex") &&
                         @event.Message.Header.Metadata != null && @event.Message.Header.Metadata.ContainsKey("BatchId") &&
@@ -172,7 +173,9 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
             try
             {
-                @event = JsonConvert.DeserializeObject<Event>(lambdaInvocationPayload.EncryptedEvent.ToUncompressedString().Decrypt());
+                @event = JsonConvert.DeserializeObject<Event>(lambdaInvocationPayload.CompressedEvent
+                    .ToUncompressedString());
+//                    .Decrypt());
                 var serviceProcess = Container.Resolve<IServiceProcess>();
                 await serviceProcess.NotifySubscriber(lambdaInvocationPayload.Subscription, @event);
             }
@@ -228,7 +231,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
                 Domain = BusinessEventStore.GetDomain(@event),
                 InstanceId = @event?.Header?.InstanceId,
                 MessageType = @event?.Message?.Header?.MessageType,
-                Message = message.Encrypt().ToCompressedBase64String(),
+                Message = message,//.Encrypt().ToCompressedBase64String(),
                 Exception = exception
             };
 
