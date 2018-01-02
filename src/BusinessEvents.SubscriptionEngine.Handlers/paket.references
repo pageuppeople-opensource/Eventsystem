@@ -1,6 +1,0 @@
-Amazon.Lambda.DynamoDBEvents
-Amazon.Lambda.KinesisEvents
-Amazon.Lambda.Core
-Amazon.Lambda.Serialization.Json
-Amazon.Lambda.APIGatewayEvents
-PageUp.Events
