@@ -50,7 +50,8 @@ namespace BusinessEvents.SubscriptionEngine.Core
                     var request = new InvokeRequest
                     {
                         FunctionName = $"{System.Environment.GetEnvironmentVariable("ACCOUNT_ID")}:{System.Environment.GetEnvironmentVariable("NOTIFY_SUBSCRIBER_LAMBDA_NAME")}",
-                        Payload = JsonConvert.SerializeObject(new LambdaInvocationPayload() {EncryptedEvent = JsonConvert.SerializeObject(@event).Encrypt().ToCompressedBase64String(), Subscription = subscriber}),
+                        Payload = JsonConvert.SerializeObject(new LambdaInvocationPayload() { CompressedEvent = JsonConvert.SerializeObject(@event).ToCompressedBase64String()
+                            , Subscription = subscriber}),
                         InvocationType = InvocationType.Event
                     };
 
