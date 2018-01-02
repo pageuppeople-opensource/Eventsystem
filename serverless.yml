@@ -41,7 +41,7 @@ functions:
       tags:
         Stream: ${self:custom.stream}
         Service: ${self:service}
-        
+
 #  process-dynamodb-stream:
 #    handler: BusinessEvents.SubscriptionEngine.Handlers::BusinessEvents.SubscriptionEngine.Handlers.Handler::ProcessDynamoDbStream
 #    memorySize: 1536
