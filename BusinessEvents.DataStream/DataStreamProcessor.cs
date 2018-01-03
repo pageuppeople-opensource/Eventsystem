@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Amazon.Lambda;
 using Amazon.Lambda.DynamoDBEvents;
 using PageUp.Events;
 using BusinessEvents.SubscriptionEngine;
 using Newtonsoft.Json;
 using BusinessEvents.DeadLetter;
 using BusinessEvents.EventStore;
+using BusinessEvents.Utilities;
 
 namespace BusinessEvents.DataStream
 {
@@ -34,7 +34,7 @@ namespace BusinessEvents.DataStream
                 Domain = BusinessEventStore.GetDomain(@event),
                 InstanceId = @event?.Header?.InstanceId,
                 MessageType = @event?.Message?.Header?.MessageType,
-                Message = message,//.Encrypt().ToCompressedBase64String(),
+                Message = message.ToCompressedBase64String(),
                 Exception = exception
             };
 

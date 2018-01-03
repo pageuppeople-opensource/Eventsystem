@@ -4,6 +4,7 @@ using Amazon.Lambda;
 using Amazon.Lambda.Model;
 using Autofac.Features.Indexed;
 using BusinessEvents.SubscriptionEngine.Notifiers;
+using BusinessEvents.Utilities;
 using Newtonsoft.Json;
 using PageUp.Events;
 

@@ -11,6 +11,7 @@ using PageUp.Events;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using BusinessEvents.Utilities;
 
 namespace BusinessEvents.SubscriptionEngine.Handlers
 {
