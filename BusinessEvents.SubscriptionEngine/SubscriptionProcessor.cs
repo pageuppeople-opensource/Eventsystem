@@ -14,11 +14,13 @@ namespace BusinessEvents.SubscriptionEngine
     {
         private readonly ISubscriptionsManager subscriptionsManager;
         private readonly IIndex<string, INotifier> notifierFactory;
+        private readonly INotifierFunctionResolver notifierFunctionResolver;
 
-        public SubscriptionProcessor(ISubscriptionsManager subscriptionsManager, IIndex<string, INotifier> notifierFactory)
+        public SubscriptionProcessor(ISubscriptionsManager subscriptionsManager, IIndex<string, INotifier> notifierFactory, INotifierFunctionResolver notifierFunctionResolver)
         {
             this.subscriptionsManager = subscriptionsManager;
             this.notifierFactory = notifierFactory;
+            this.notifierFunctionResolver = notifierFunctionResolver;
         }
         public async Task Process(Event @event)
         {
@@ -40,7 +42,7 @@ namespace BusinessEvents.SubscriptionEngine
                 {
                     var request = new InvokeRequest
                     {
-                        FunctionName = $"{System.Environment.GetEnvironmentVariable("ACCOUNT_ID")}:{System.Environment.GetEnvironmentVariable("NOTIFY_SUBSCRIBER_LAMBDA_NAME")}",
+                        FunctionName = notifierFunctionResolver.GetNotifierFunction(),
                         Payload = JsonConvert.SerializeObject(new LambdaInvocationPayload()
                         {
                             CompressedEvent = JsonConvert.SerializeObject(@event).ToCompressedBase64String(),

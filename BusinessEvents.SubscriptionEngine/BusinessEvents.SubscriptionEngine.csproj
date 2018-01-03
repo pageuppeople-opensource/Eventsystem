@@ -10,6 +10,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
     <PackageReference Include="PageUp.Telemetry" Version="1.2.6" />
     <PackageReference Include="AWSSDK.S3" Version="3.3.4" />
+    <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0*" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BusinessEvents.AwsFactories\BusinessEvents.Utilities.csproj">
