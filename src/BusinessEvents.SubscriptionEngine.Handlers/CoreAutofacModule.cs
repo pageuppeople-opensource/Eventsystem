@@ -1,10 +1,13 @@
-﻿using Amazon.Lambda.Core;
+﻿using System.IO;
+using Amazon.Lambda.Core;
 using Autofac;
 using BusinessEvents.DataStream;
 using BusinessEvents.DeadLetter;
 using BusinessEvents.EventStore;
 using BusinessEvents.EventStream;
 using BusinessEvents.SubscriptionEngine.Notifiers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace BusinessEvents.SubscriptionEngine.Handlers
 {
@@ -16,12 +19,26 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
         {
             this.lambdaContext = lambdaContext;
         }
-        
+
+        private void ConfigureLogging()
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
+
+            var configuration = builder.Build();
+            
+            ILoggerFactory loggerFactory = new LoggerFactory();
+            loggerFactory.AddAWSProvider(configuration.GetAWSLoggingConfigSection());
+        }
+
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
 
             builder.RegisterInstance(lambdaContext);
+            
+            ConfigureLogging();
             
             builder.RegisterType<EventStreamProcessor>().As<IEventStreamProcessor>().SingleInstance();
             builder.RegisterType<BusinessEventStore>().As<IBusinessEventStore>().SingleInstance();

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace BusinessEvents.SubscriptionEngine.Tests
 {
-    public class NotifierTests: TestBase
+    public class NotifierTests
     {
         private ISubscriberErrorService dummSubscriberErrorService =
             NSubstitute.Substitute.For<ISubscriberErrorService>();

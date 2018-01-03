@@ -20,7 +20,6 @@
     <PackageReference Include="Amazon.Lambda.TestUtilities" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BusinessEvents.SubscriptionEngine.Core\BusinessEvents.SubscriptionEngine.Core.csproj" />
     <ProjectReference Include="..\BusinessEvents.SubscriptionEngine.Handlers\BusinessEvents.SubscriptionEngine.Handlers.csproj" />
   </ItemGroup>
   <ItemGroup>
