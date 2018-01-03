@@ -7,6 +7,7 @@ using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.Runtime.Internal;
+using BusinessEvents.Utilities;
 using Newtonsoft.Json;
 using PageUp.Events;
 
@@ -135,9 +136,7 @@ namespace BusinessEvents.EventStore
                         "MessageType", new AttributeValue { S = @event.Message.Header.MessageType }
                     },
                     {
-                        "Data", new AttributeValue {S = JsonConvert.SerializeObject(@event)
-//                            .Encrypt().ToCompressedBase64String() 
-                        }
+                        "Data", new AttributeValue {S = JsonConvert.SerializeObject(@event).ToCompressedBase64String() }
                     }
                 }
             };

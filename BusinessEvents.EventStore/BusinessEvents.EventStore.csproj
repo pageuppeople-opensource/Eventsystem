@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyTitle>BusinessEvents.EventStore</AssemblyTitle>
     <TargetFramework>netstandard1.6</TargetFramework>
@@ -9,5 +9,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.4" />
     <PackageReference Include="PageUp.Events" Version="0.0.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BusinessEvents.AwsFactories\BusinessEvents.Utilities.csproj">
+      <Project>{144496C4-9133-4DF7-91F1-AE313C2DF47F}</Project>
+      <Name>BusinessEvents.Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Amazon.Lambda.KinesisEvents;
 using BusinessEvents.DeadLetter;
 using BusinessEvents.EventStore;
+using BusinessEvents.Utilities;
 using Newtonsoft.Json;
 using PageUp.Events;
 
@@ -33,7 +34,7 @@ namespace BusinessEvents.EventStream
                 Domain = BusinessEventStore.GetDomain(@event),
                 InstanceId = @event?.Header?.InstanceId,
                 MessageType = @event?.Message?.Header?.MessageType,
-                Message = message,//.Encrypt().ToCompressedBase64String(),
+                Message = message.ToCompressedBase64String(),
                 Exception = exception
             };
 

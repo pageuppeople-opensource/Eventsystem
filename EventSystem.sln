@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{75DA1CC6-73A2-4855-AE6E-9B8F4693FD73}"
 EndProject
@@ -33,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.EventStream"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.EventStore", "BusinessEvents.EventStore\BusinessEvents.EventStore.csproj", "{5D26F559-5369-4E28-8F16-9837B1ADB248}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.AwsFactories", "BusinessEvents.AwsFactories\BusinessEvents.AwsFactories.csproj", "{144496C4-9133-4DF7-91F1-AE313C2DF47F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.Utilities", "BusinessEvents.AwsFactories\BusinessEvents.Utilities.csproj", "{144496C4-9133-4DF7-91F1-AE313C2DF47F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.DeadLetter", "BusinessEvents.DeadLetter\BusinessEvents.DeadLetter.csproj", "{02BBEA5B-1F8E-4334-A717-25F5374C97DC}"
 EndProject
