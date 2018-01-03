@@ -49,11 +49,8 @@ namespace BusinessEvents.DataStream
             }
         }
 
-        public async Task Process(DynamoDBEvent dynamoDbEvent, string awsAccountId)
+        public async Task Process(DynamoDBEvent dynamoDbEvent)
         {
-            Environment.SetEnvironmentVariable("ACCOUNT_ID", awsAccountId);
-            
-
             foreach (var record in dynamoDbEvent.Records)
             {
                 Event @event = null;

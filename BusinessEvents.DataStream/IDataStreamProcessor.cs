@@ -5,6 +5,6 @@ namespace BusinessEvents.DataStream
 {
     public interface IDataStreamProcessor
     {
-        Task Process(DynamoDBEvent dynamoDbEvent, string awsAccountId);
+        Task Process(DynamoDBEvent dynamoDbEvent);
     }
 }

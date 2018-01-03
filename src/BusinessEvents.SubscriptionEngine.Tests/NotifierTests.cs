@@ -11,23 +11,6 @@ namespace BusinessEvents.SubscriptionEngine.Tests
             NSubstitute.Substitute.For<ISubscriberErrorService>();
 
         [Fact]
-        public async void PostsToSlack()
-        {
-            var slackSubscription = new Subscription()
-            {
-                Type = SubscriptionType.Slack,
-                Endpoint = new Uri("https://hooks.slack.com/services/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"),
-                BusinessEvent = "*"
-            };
-
-            var testEvent = Event.CreateEvent("isntanceid", "messagetype", "userid", new { contentbody = "contentbody" }, null, "someorigin");
-
-            var notifier = new SlackNotifier(dummSubscriberErrorService);
-
-            await notifier.Notify(slackSubscription, testEvent);
-        }
-
-        [Fact]
         public async void PostsToWebEndpoint()
         {
             var slackSubscription = new Subscription()

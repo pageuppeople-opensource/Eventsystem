@@ -15,16 +15,13 @@ using BusinessEvents.Utilities;
 
 namespace BusinessEvents.SubscriptionEngine.Handlers
 {
-    public sealed class Handler : BaseHandler
+    public sealed class Handler
     {
-        public Handler()
+        private static IContainer GetContainer(ILambdaContext lambdaContext)
         {
-            Container = BuildContainer();
-        }
-
-        public Handler(IContainer container)
-        {
-            Container = container;
+            var builder = new ContainerBuilder();
+            builder.RegisterModule(new CoreAutofacModule(lambdaContext));
+            return builder.Build();
         }
 
         public async Task<APIGatewayProxyResponse> EventGet(APIGatewayProxyRequest request, ILambdaContext context)
@@ -33,7 +30,7 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
             logger.Log(JsonConvert.SerializeObject(request));
             var messageId = request.PathParameters.ContainsKey("messageId") ? request.PathParameters["messageId"] : throw new HttpRequestException("Bad Request");
 
-            var businessEventStore = Container.Resolve<IBusinessEventStore>();
+            var businessEventStore = GetContainer(context).Resolve<IBusinessEventStore>();
 
             var item = await businessEventStore.QueryByMessageId(messageId, 1);
 
@@ -47,30 +44,23 @@ namespace BusinessEvents.SubscriptionEngine.Handlers
 
         public async Task ProcessKinesisStream(KinesisEvent kinesisEvent, ILambdaContext context)
         {
-            var eventStreamProcessor = Container.Resolve<IEventStreamProcessor>();
+            var eventStreamProcessor = GetContainer(context).Resolve<IEventStreamProcessor>();
 
             await eventStreamProcessor.Process(kinesisEvent);
         }
 
-        private static string GetAccountId(string functionArn)
-        {
-            var arnItems = functionArn.Split(':');
-            return arnItems[4];
-        }
-
         public async Task ProcessDynamoDbStream(DynamoDBEvent dynamoDbEvent, ILambdaContext context)
         {
-            var dataStreamProcessor = Container.Resolve<IDataStreamProcessor>();
-            await dataStreamProcessor.Process(dynamoDbEvent, GetAccountId(context.InvokedFunctionArn));
+            var dataStreamProcessor = GetContainer(context).Resolve<IDataStreamProcessor>();
+            await dataStreamProcessor.Process(dynamoDbEvent);
         }
 
-        public async Task NotifySubscriber(BusinessEvents.SubscriptionEngine.LambdaInvocationPayload lambdaInvocationPayload, ILambdaContext context)
+        public async Task NotifySubscriber(LambdaInvocationPayload lambdaInvocationPayload, ILambdaContext context)
         {  
            var @event = JsonConvert.DeserializeObject<Event>(lambdaInvocationPayload.CompressedEvent.ToUncompressedString());
 
-           var serviceProcess = Container.Resolve<ISubscriptionProcessor>();
+           var serviceProcess = GetContainer(context).Resolve<ISubscriptionProcessor>();
            await serviceProcess.NotifySubscriber(lambdaInvocationPayload.Subscription, @event);
-           
         }
     }
 }
