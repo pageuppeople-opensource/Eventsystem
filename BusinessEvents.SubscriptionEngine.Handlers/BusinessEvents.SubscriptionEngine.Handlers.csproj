@@ -26,7 +26,7 @@
     <PackageReference Include="AWS.Logger.AspNetCore" Version="1.2.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BusinessEvents.DataStream\BusinessEvents.DataStream.csproj" />
+    <ProjectReference Include="..\BusinessEvents.DataStream\BusinessEvents.DataStream.csproj" />
     <ProjectReference Include="..\BusinessEvents.EventStream\BusinessEvents.EventStream.csproj" />
   </ItemGroup>
 </Project>

@@ -6,8 +6,8 @@
     <RootNamespace>BusinessEvents.EventStream</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BusinessEvents.DeadLetter\BusinessEvents.DeadLetter.csproj" />
-    <ProjectReference Include="..\..\BusinessEvents.EventStore\BusinessEvents.EventStore.csproj" />
+    <ProjectReference Include="..\BusinessEvents.DeadLetter\BusinessEvents.DeadLetter.csproj" />
+    <ProjectReference Include="..\BusinessEvents.EventStore\BusinessEvents.EventStore.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.KinesisEvents" Version="1.0.1" />
