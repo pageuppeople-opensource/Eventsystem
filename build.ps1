@@ -7,7 +7,7 @@ function ZipFiles( $zipfilename, $sourcedir )
         $zipfilename, $compressionLevel, $false)
 }
 
-$handlersDirectory = "src/BusinessEvents.SubscriptionEngine.Handlers"
+$handlersDirectory = "BusinessEvents.SubscriptionEngine.Handlers"
 
 dotnet restore
 dotnet publish -c release "$handlersDirectory"
