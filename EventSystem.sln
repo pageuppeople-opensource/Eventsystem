@@ -23,11 +23,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		subscriptions.json = subscriptions.json
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine.Handlers", "src\BusinessEvents.SubscriptionEngine.Handlers\BusinessEvents.SubscriptionEngine.Handlers.csproj", "{BE4152CC-55B1-4EA7-BF62-B56FB9066D40}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine.Handlers", "BusinessEvents.SubscriptionEngine.Handlers\BusinessEvents.SubscriptionEngine.Handlers.csproj", "{BE4152CC-55B1-4EA7-BF62-B56FB9066D40}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine.Tests", "src\BusinessEvents.SubscriptionEngine.Tests\BusinessEvents.SubscriptionEngine.Tests.csproj", "{D3C1B13D-6650-4208-B592-A0AF15CF8DB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.SubscriptionEngine.Tests", "BusinessEvents.SubscriptionEngine.Tests\BusinessEvents.SubscriptionEngine.Tests.csproj", "{D3C1B13D-6650-4208-B592-A0AF15CF8DB2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.EventStream", "src\BusinessEvents.EventStream\BusinessEvents.EventStream.csproj", "{FE41088A-698A-4271-AF60-77321D8ED06E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.EventStream", "BusinessEvents.EventStream\BusinessEvents.EventStream.csproj", "{FE41088A-698A-4271-AF60-77321D8ED06E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessEvents.EventStore", "BusinessEvents.EventStore\BusinessEvents.EventStore.csproj", "{5D26F559-5369-4E28-8F16-9837B1ADB248}"
 EndProject
