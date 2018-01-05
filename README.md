@@ -1,5 +1,5 @@
 # Eventsystem
-[![serverless](https://dl.dropboxusercontent.com/s/d6opqwym91k0roz/serverless_badge_v3.svg)](http://www.serverless.com) [![Build Status](https://travis-ci.com/PageUpPeopleOrg/PageUp.EventSystem.svg?token=dukFECyWinXromxHYFWE)](https://travis-ci.com/PageUpPeopleOrg/PageUp.EventSystem)
+[![serverless](https://dl.dropboxusercontent.com/s/d6opqwym91k0roz/serverless_badge_v3.svg)](http://www.serverless.com) [![Build Status](https://travis-ci.org/PageUpPeopleOrg/Eventsystem.svg?branch=master)](https://travis-ci.org/PageUpPeopleOrg/Eventsystem)
 
 Eventsystem - Enables applications and microservices to pass events between them reliably thereby enabling building decoupled domains and systems.
 
